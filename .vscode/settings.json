@@ -1,0 +1,4 @@
+{
+    "python.formatting.provider": "black",
+    "code-runner.executorMap": {"python": "$pythonPath $fullFileName"}
+}
