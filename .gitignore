@@ -188,5 +188,9 @@ cython_debug/
 # Ignore code-workspaces
 *.code-workspace
 
+# Development Files
+response-schema.json
+*.csv
+
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 
