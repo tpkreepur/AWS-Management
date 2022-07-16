@@ -1,4 +1,5 @@
 from distutils.debug import DEBUG
+from unicodedata import name
 import boto3
 import sys
 import json
@@ -211,12 +212,32 @@ class EC2Instances:
                         )
                     )
 
+    def describe_instances(self) -> list:
+        """
+        Describe all EC2 instances and return the results.
+        """
+        instanceList = []
+        for instance in self.resource.instances.all():
+            for tag in instance.tags:
+                if tag["Key"] == "Name":
+                    print(tag["Value"])
+                    name = tag["Value"]
+            i = {
+                "Name": name,
+                "ID": instance.id,
+                "Private IP": instance.private_ip_address,
+                "State": instance.state,
+                "Instance Type": instance.instance_type,
+                "Platform Details": instance.platform,
+                "Volume Details": instance.block_device_mappings,
+            }
+        instanceList.append(i)
+        return instanceList
+
 
 def test_print_functions():
-    """
-    Test the print functions
-    """
-    pass
+    EC2 = EC2Instances()
+    EC2.describe_instances()
 
 
 def main():
@@ -293,8 +314,8 @@ def test_main():
     """
     Test the main function
     """
-    EC2Instances().get_total_windows_instances()
-    EC2Instances().get_total_linux_instances()
+    EC2 = EC2Instances()
+    EC2.describe_instances()
 
 
 if __name__ == "__main__":

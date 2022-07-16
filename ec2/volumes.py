@@ -9,25 +9,17 @@ class EC2Volumes:
     def describe_volumes(self) -> list:
         """Prints all volume information with the following columns:
         Volume ID, Volume Type, Volume Size, Volume State, Volume Availability Zone, Volume Encrypted, Volume Snapshot ID, Volume Iops, Volume Tags"""
-        volumes = []
-        print(self.volumes)
-        for volume in self.volumes:
-            print(
-                "{},{},{},{},{},{},{},{},{}".format(
-                    volume.tags[0]["Value"],
-                    volume.id,
-                    volume.volume_type,
-                    volume.size,
-                    volume.state,
-                    volume.availability_zone,
-                    volume.encrypted,
-                    volume.snapshot_id,
-                    volume.iops,
-                    volume.tags,
-                )
-            )
-            volume = {
-                "Name": volume.tags[0]["Value"],
+        volumes = self.ec2.volumes.all()
+        print([volume for volume in volumes])
+        volumeList = []
+        for volume in volumes:
+            if volume.tags:
+                vol = volume.tags[0]["Value"]
+            else:
+                vol = volume.id
+
+            vol = {
+                "Name": vol.upper(),
                 "ID": volume.id,
                 "Type": volume.volume_type,
                 "Size": volume.size,
@@ -38,9 +30,11 @@ class EC2Volumes:
                 "Iops": volume.iops,
                 "Tags": volume.tags,
             }
-            volumes.append(volume)
-        print("Number of volumes: ", len(volumes))
-        return volumes
+
+            print(vol)
+            volumeList.append(vol)
+
+        return volumeList
 
     def print_all_volumes_to_csv(self):
         """Prints all volume information to a csv file"""
@@ -97,11 +91,10 @@ class EC2Volumes:
 
     def get_volume_name(self, volume_id: str) -> str:
         """Returns the name of a volume"""
-        for v in self.volumes:
-            if v.id == volume_id:
-                for tag in v.tags:
-                    if tag["Key"] == "Name":
-                        return tag["Value"]
+        for v in self.ec2.volumes.all():
+            for tag in v.tags:
+                if tag["Key"] == "Name" and v.id == volume_id:
+                    return tag["Value"]
 
     def get_volume_size(self, volume_id: str) -> int:
         """Returns the size of a volume"""

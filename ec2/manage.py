@@ -99,9 +99,7 @@ class EC2Manager:
 
 def print_report():
     manager = EC2Manager()
-    instances = [
-        instance for instance in manager.instances.describe_running_instances()
-    ]
+    instances = manager.instances.describe_instances()
     volumes = manager.volumes.describe_volumes()
     snapshots = manager.snapshots.get_snapshots()
     """Prints a report to a markdown file"""
@@ -120,22 +118,15 @@ def print_report():
             f.write("| Instance ID | Private IP | State | Platform Details |\n")
             f.write("| ----------- | --------- | ----- | ---------------- |\n")
             f.write(
-                "| "
-                + instance["Instance ID"]
-                + " | "
-                + instance["Instance Type"]
-                + " | "
-                + instance["Private IP"]
-                + " | "
-                + instance["State"]
-                + " | "
-                + instance["Platform Details"]
-                + " |\n\n"
+                f"| {instance['ID']} | {instance['Private IP']} | {instance['State']} | {instance['Platform Details']} |\n"
             )
         f.write(volumesHeader)
         f.write(volumesTotals)
         for volume in volumes:
-            f.write("### " + volume["Name"] + "\n\n")
+            if volume["Name"]:
+                f.write("### " + volume["Name"] + "\n\n")
+            else:
+                f.write("### " + volume["ID"] + "\n\n")
             f.write("---\n\n")
             f.write("| Volume ID | Volume Size | State | Type | Iops | Encrypted |\n")
             f.write(
