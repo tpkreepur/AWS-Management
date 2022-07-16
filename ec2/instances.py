@@ -1,3 +1,4 @@
+from distutils.debug import DEBUG
 import boto3
 import sys
 import json
@@ -43,14 +44,13 @@ class EC2Instances:
         Total number of EC2 instances that are running on Linux
         """
         linuxCount = 0
-        linux = self.client.describe_instances(
-            Filters=[{"Name": "platform", "Values": ["linux"]}]
-        )
-        print(
-            "Total number of EC2 instances that are running on Linux: ",
-            len(linux["Reservations"]),
-        )
-        return len(linux["Reservations"])
+        for instance in self.instances:
+            """If platform in not windows, print instance details"""
+            if instance.platform != "windows":
+                linuxCount += 1
+                print(instance.platform, instance.instance_id)
+
+        print("Total number of EC2 instances that are running on Linux: ", linuxCount)
 
     def get_instances(self) -> list:
         """
@@ -294,6 +294,7 @@ def test_main():
     Test the main function
     """
     EC2Instances().get_total_windows_instances()
+    EC2Instances().get_total_linux_instances()
 
 
 if __name__ == "__main__":
