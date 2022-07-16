@@ -1,38 +1,36 @@
+import os
 import boto3
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class EC2Snapshots:
     def __init__(self):
         self.ec2 = boto3.resource("ec2")
-        self.snapshots = self.ec2.snapshots.filter(OwnerIds=["self"])
+        self.client = boto3.client("ec2")
+        self.snapshots = self.client.describe_snapshots(
+            OwnerIds=[os.environ["AWS_ACCOUNT_ID"]]
+        )
 
     def get_total_snapshot_count(self) -> int:
         """Returns the total number of snapshots"""
-        snaps = [s for s in self.snapshots]
-        print("Total number of snapshots:", len(snaps))
+        print("Total number of snapshots:", len(self.snapshots["Snapshots"]))
+        return len(self.snapshots["Snapshots"])
 
-        return len(snaps)
+    def get_snapshot_count_by_volume_id(self, volume_id: str) -> int:
+        """Returns the number of snapshots for a volume"""
+        snapshots = self.get_snapshots_by_volume_id(volume_id)
+        return len(snapshots)
 
-    def get_snapshot_by_volume_id(self, volume_id: str) -> list:
-        """Returns a list of snapshots owned by the user"""
+    def get_snapshots_by_volume_id(self, volume_id: str) -> list:
+        """Returns a list of snapshots for a volume"""
         snapshots = []
         for s in self.snapshots:
-            if s.get("VolumeId") == volume_id:
+            if s["VolumeId"] == volume_id:
                 snapshots.append(s)
+            print("Snapshot ID:", s["SnapshotId"])
         return snapshots
-
-    def describe_owned_snapshots(self):
-        """Returns a list of snapshots owned by the user"""
-        for s in self.snapshots:
-            print(
-                "Snapshot ID:",
-                s.get("SnapshotId"),
-                "\nVolume ID:",
-                s.get("VolumeId"),
-                "\nState:",
-                s.get("State"),
-            )
-        return self.snapshots
 
     def get_snapshots(self) -> list:
         """Returns a list of snapshots owned by the user"""
@@ -43,8 +41,9 @@ class EC2Snapshots:
 
 
 def main():
+    print(os.environ["AWS_ACCOUNT_ID"])
     ec2_snapshots = EC2Snapshots()
-    ec2_snapshots.get_total_snapshot_count()
+    ec2_snapshots.get_snapshots_by_volume_id("vol-060cf2a35e5dfcfce")
 
 
 if __name__ == "__main__":

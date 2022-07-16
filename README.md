@@ -9,6 +9,8 @@ Total number of EC2 instances in stopped state: 39
 Total number of Windows instances: 53
 Total number of Linux instances: 28
 
+
+
 ## VPC Management
 
 ## RDS Management

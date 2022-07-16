@@ -72,6 +72,29 @@ class EC2Volumes:
         print("Total number of volumes: ", len(self.volumes))
         return len(self.volumes)
 
+    def get_volume_ids(self) -> list:
+        """Returns a list of all volume IDs"""
+        volume_ids = []
+        for v in self.volumes:
+            print(v.id)
+            volume_ids.append(v.id)
+
+        return volume_ids
+
+    def get_volume_name(self, volume_id: str) -> str:
+        """Returns the name of a volume"""
+        for v in self.volumes:
+            if v.id == volume_id:
+                for tag in v.tags:
+                    if tag["Key"] == "Name":
+                        return tag["Value"]
+
+    def get_volume_size(self, volume_id: str) -> int:
+        """Returns the size of a volume"""
+        for v in self.volumes:
+            if v.id == volume_id:
+                return f"{v.size} GB"
+
 
 def test_print_functions():
     ec2_volumes = EC2Volumes()
@@ -83,7 +106,7 @@ def test_print_functions():
 
 def main():
     ec2_volumes = EC2Volumes()
-    print(ec2_volumes.get_volumes_by_instance_id("i-02820785140c08eb5"))
+    print(ec2_volumes.get_volume_size("vol-0de149647779be1bc"))
 
 
 if __name__ == "__main__":

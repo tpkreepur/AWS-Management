@@ -82,26 +82,19 @@ class EC2Manager:
             print("|\tOwner ID: " + snapshot.get("OwnerId"))
             print("|\tTags: " + str(snapshot.get("Tags")))
 
-    def list_snapshots_by_volume(self, volume_id):
+    def list_snapshots_by_volume(self):
         """Lists snapshots by volume ID"""
-        for snapshot in self.snapshots:
-            if snapshot.get("VolumeId") == volume_id:
-                print("-Snapshot Name: " + snapshot.get("Tags")[0].get("Value"))
-                print("|\tID: " + snapshot.get("SnapshotId"))
-                print("|\tVolume ID: " + snapshot.get("VolumeId"))
-                print("|\tState: " + snapshot.get("State"))
-                print("|\tStart Time: " + str(snapshot.get("StartTime")))
-                print("|\tProgress: " + snapshot.get("Progress"))
-                print("|\tVolume Size: " + str(snapshot.get("VolumeSize")) + "GB")
-                print("|\tDescription: " + snapshot.get("Description"))
-                print("|\tOwner ID: " + snapshot.get("OwnerId"))
-                print("|\tTags: " + str(snapshot.get("Tags")))
+        volumeIDs = self.volumes.get_volume_ids()
+        for id in volumeIDs:
+            print("-Volume ID: " + id)
+            print("|\tSnapshots:")
+            for snapshot in self.snapshots.get_snapshots_by_volume(id):
+                print(len())
 
 
 def main():
     man = EC2Manager()
-    man.get_total_windows_instances()
-    man.get_total_linux_instances()
+    man.list_snapshots_by_volume()
 
 
 if __name__ == "__main__":
