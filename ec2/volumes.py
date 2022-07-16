@@ -6,15 +6,15 @@ class EC2Volumes:
         self.ec2 = boto3.resource("ec2")
         self.volumes = [vol for vol in self.ec2.volumes.all()]
 
-    def describe_volumes(self):
+    def describe_volumes(self) -> list:
         """Prints all volume information with the following columns:
         Volume ID, Volume Type, Volume Size, Volume State, Volume Availability Zone, Volume Encrypted, Volume Snapshot ID, Volume Iops, Volume Tags"""
-        print("All Volume Information:")
-        print("-----------------------------------------------------------")
+        volumes = []
+        print(self.volumes)
         for volume in self.volumes:
-            print("|Volume Name: {}".format(volume.tags[0]["Value"]))
             print(
-                "|\tID: {} \n|\tType: {} \n|\tSize: {} GB\n|\tState: {} \n|\tAvailability Zone: {} \n|\tEncrypted: {} \n|\tSnapshot ID: {} \n|\tIops: {}".format(
+                "{},{},{},{},{},{},{},{},{}".format(
+                    volume.tags[0]["Value"],
                     volume.id,
                     volume.volume_type,
                     volume.size,
@@ -23,9 +23,24 @@ class EC2Volumes:
                     volume.encrypted,
                     volume.snapshot_id,
                     volume.iops,
+                    volume.tags,
                 )
             )
-            print("-----------------------------------------------------------")
+            volume = {
+                "Name": volume.tags[0]["Value"],
+                "ID": volume.id,
+                "Type": volume.volume_type,
+                "Size": volume.size,
+                "State": volume.state,
+                "Availability Zone": volume.availability_zone,
+                "Encrypted": volume.encrypted,
+                "Snapshot ID": volume.snapshot_id,
+                "Iops": volume.iops,
+                "Tags": volume.tags,
+            }
+            volumes.append(volume)
+        print("Number of volumes: ", len(volumes))
+        return volumes
 
     def print_all_volumes_to_csv(self):
         """Prints all volume information to a csv file"""
@@ -64,7 +79,7 @@ class EC2Volumes:
         for v in self.volumes:
             if v.attachments[0]["InstanceId"] == instance_id:
                 volumes.append(v)
-        print(volumes)
+
         return volumes
 
     def get_total_volume_count(self) -> int:
@@ -76,7 +91,6 @@ class EC2Volumes:
         """Returns a list of all volume IDs"""
         volume_ids = []
         for v in self.volumes:
-            print(v.id)
             volume_ids.append(v.id)
 
         return volume_ids
@@ -106,7 +120,7 @@ def test_print_functions():
 
 def main():
     ec2_volumes = EC2Volumes()
-    print(ec2_volumes.get_volume_size("vol-0de149647779be1bc"))
+    ec2_volumes.describe_volumes()
 
 
 if __name__ == "__main__":

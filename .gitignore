@@ -191,6 +191,7 @@ cython_debug/
 # Development Files
 response-schema.json
 *.csv
+report.md
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 
