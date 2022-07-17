@@ -44,15 +44,21 @@ class EC2Instances:
             for tag in instance.tags:
                 if tag["Key"] == "Name":
                     name = tag["Value"]
-                """If backup tag exists, check if yes"""
-                if tag["Key"].lower() == "backup" and tag["Value"].lower() == "yes":
-                    backup = True
-                else:
-                    backup = False
+            volumeCount = len(instance.block_device_mappings)
+            for volume in instance.volumes.all():
 
-            for volume in instance.block_device_mappings:
-                volumeCount = len(instance.block_device_mappings)
-
+                for tag in volume.tags:
+                    if (
+                        tag["Key"].lower() == "snapshot"
+                        or tag["Key"].lower() == "backup"
+                    ):
+                        backup = (
+                            True
+                            if tag["Value"] == "1" or tag["Value"] == "yes"
+                            else False
+                        )
+                    else:
+                        backup = False
             instance = {
                 "ID": instance.id,
                 "NAME": name,
@@ -62,9 +68,22 @@ class EC2Instances:
                 "VOLS": volumeCount,
                 "BACKUP": backup,
             }
-            print(instance)
             instanceList.append(instance)
         return instanceList
+
+    def get_backup_status_from_tags(self) -> list:
+        """
+        Get all EC2 instances and return the results.
+        """
+        backupStatus = []
+        for instance in self.ec2.instances.all():
+            for volume in instance.volumes.all():
+                print(volume.id, volume.state, volume.tags)
+                for tag in volume.tags:
+                    if tag["Key"] == "snapshot" or tag["Key"] == "backup":
+                        backupStatus.append(tag["Value"])
+
+        return backupStatus
 
     def get_instance_ids(self) -> list:
         """
@@ -266,7 +285,7 @@ def main():
     Main function
     """
     ec2 = EC2Instances()
-    ec2.print_ec2_instances_to_csv()
+    print(ec2.get_all_instance_details())
 
 
 if __name__ == "__main__":

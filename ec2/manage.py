@@ -133,8 +133,6 @@ def print_report():
 
     """Prints a report to a markdown file"""
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    WINDOWS_RUNNING = manager.instances.describe_running_windows_instances()
-    LINUX_RUNNING = manager.instances.describe_running_linux_instances()
     attachedVolCount = manager.get_attached_volume_count()
     unattachedVolCount = manager.get_unattached_volume_count()
     with open("report.md", "w") as f:
@@ -191,33 +189,39 @@ def print_report():
             f"| {manager.get_total_volume_size()} GB | {attachedVolCount} | {unattachedVolCount} |\n"
         )
         f.write("\n### VOLUMES Attached\n\n---\n\n")
-        f.write("| Volume ID | Size | Availability Zone |\n|:---|:---|:---|\n")
+        f.write(
+            "| Volume ID | Name | Size | Availability Zone |\n|:---|:---|:---|:---|\n"
+        )
         if attachedVolCount == 0:
             f.write("No volumes attached\n")
         else:
             if attachedVolCount > 0:
                 for i in manager.get_attached_volumes():
-                    f.write(f"| {i.id} | {i.size} GB | {i.availability_zone} |\n")
+                    f.write(
+                        f"| {i.id} | {manager.volumes.get_volume_name(i.id)} |{i.size} GB | {i.availability_zone} |\n"
+                    )
         f.write("\n### VOLUMES Unattached\n\n---\n\n")
         f.write(
-            "| Total Storage | Volumes attached | Volumes unattached |\n|:---|:---|:---|\n"
+            "| Volume ID | Name | Size | Availability Zone |\n|:---|:---|:---|:---|\n"
         )
         if unattachedVolCount == 0:
             f.write("No volumes unattached\n")
         else:
             if unattachedVolCount > 0:
                 for i in manager.get_unattached_volumes():
-                    f.write(f"| {i.id} | {i.size} GB | {i.availability_zone} |\n")
+                    f.write(
+                        f"| {i.id} | {manager.volumes.get_volume_name(i.id)} | {i.size} GB | {i.availability_zone} |\n"
+                    )
 
         """Snapshot Information"""
 
         f.write(
             f"\n### SNAPSHOTS Total: {manager.get_total_snapshot_count()}\n\n---\n\n"
         )
-        f.write("| Volume ID | Snapshot Count |\n|:---|:---|\n")
+        f.write("| Volume ID | Volume Name |Snapshot Count |\n|:---|:---|:---|\n")
         for volume in manager.get_volume_ids():
             f.write(
-                f"| {volume} | {manager.snapshots.get_snapshot_count_by_volume_id(volume)} |\n"
+                f"| {volume} | {manager.volumes.get_volume_name(volume)} | {manager.snapshots.get_snapshot_count_by_volume_id(volume)} |\n"
             )
         f.write("---\n\n")
         f.write(

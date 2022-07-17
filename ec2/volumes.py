@@ -36,10 +36,6 @@ class EC2Volumes:
 
         return volumeList
 
-    def print_all_volumes_to_csv(self):
-        """Prints all volume information to a csv file"""
-        
-
     def get_volumes(self) -> list:
         """Returns a list of all volumes"""
         volume = []
@@ -111,18 +107,9 @@ class EC2Volumes:
         else:
             return None
 
-
-def test_print_functions():
-    ec2_volumes = EC2Volumes()
-    for volume in ec2_volumes.get_volumes():
-        print(volume.tags[0]["Value"])
-
-    print(len(ec2_volumes.get_volumes()))
-
-
 def main():
     ec2_volumes = EC2Volumes()
-    print(ec2_volumes.get_unattached_volumes())
+    ec2_volumes.describe_volumes()
 
 
 if __name__ == "__main__":
