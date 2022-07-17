@@ -20,7 +20,7 @@ class EC2Manager:
 
     def get_total_instance_count(self) -> int:
         """Returns the total number of instances"""
-        return self.instances.get_total_instances()
+        return self.instances.get_total_instance_count()
 
     def get_total_volume_count(self) -> int:
         """Returns the total number of volumes"""
@@ -128,7 +128,7 @@ class EC2Manager:
 
 def print_report():
     manager = EC2Manager()
-    instances = manager.instances.report()
+    instances = manager.instances.get_all_instance_details()
     platforms = manager.instances.get_platform_counts()
 
     """Prints a report to a markdown file"""
@@ -139,22 +139,21 @@ def print_report():
     unattachedVolCount = manager.get_unattached_volume_count()
     with open("report.md", "w") as f:
         f.write("# XATOR AWS EC2 REPORT\n\n")
-        f.write("## INSTANCES Total: {}\n\n".format(instances[0]["total"]))
+
+        """Instance Information"""
+
+        f.write("## INSTANCES Total: {}\n\n".format(manager.get_total_instance_count()))
         f.write("| Windows | Linux |\n|:---|:---|\n")
         f.write(f"| {platforms.get('Windows')} | {platforms.get('Linux')} |  | |\n")
         f.write(
             f"\n### INSTANCES Running Total: {manager.instances.get_total_running_instances()}\n\n---\n\n"
         )
         f.write(
-            "| Instance Name | Instance ID | Private IP | State | Instance Type | Platform |\n|:---|:---|:---|:---|:---|:---|\n"
+            "| Instance ID | Name | Type | State | Platform | Volumes | Backed up? |\n|:---|:---|:---|:---|:---|:---|:---|\n"
         )
-        for i in WINDOWS_RUNNING:
+        for i in instances:
             f.write(
-                f"| {i['Name']} | {i['ID']} | {i['Private IP']} | {i['State']} | {i['Instance Type']} | {i['Platform Details']} |\n"
-            )
-        for i in LINUX_RUNNING:
-            f.write(
-                f"| {i['Name']} | {i['ID']} | {i['Private IP']} | {i['State']} | {i['Instance Type']} | {i['Platform Details']} |\n"
+                f"| {i['ID']}| {i['NAME']} | {i['TYPE']} | {i['STATE']} | {i['PLATFORM']} | {i['VOLS']} | {i['BACKUP']} |\n"
             )
         f.write(
             f"\n### INSTANCES Stopped Total: {manager.instances.get_total_stopped_instances()}\n\n---\n\n"
@@ -167,6 +166,9 @@ def print_report():
         else:
             f.write("No stopped instances found")
         f.write("\n\n")
+
+        """Volume Information"""
+
         f.write(f"## VOLUMES Total: {manager.get_total_volume_count()}\n\n---\n\n")
         f.write(
             "| Total Storage | Volumes attached | Volumes unattached |\n|:---|:---|:---|\n"
@@ -189,6 +191,9 @@ def print_report():
             if unattachedVolCount > 0:
                 for i in manager.get_unattached_volumes():
                     f.write(f"| {i.id} | {i.size} GB | {i.availability_zone} |\n")
+
+        """Snapshot Information"""
+
         f.write(
             f"\n## SNAPSHOTS Total: {manager.get_total_snapshot_count()}\n\n---\n\n"
         )

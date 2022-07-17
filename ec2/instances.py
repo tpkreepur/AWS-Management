@@ -37,11 +37,34 @@ class EC2Instances:
         platformCounts = {"Windows": windows, "Linux": linux}
         return platformCounts
 
-    def get_instances(self) -> list:
-        """
-        Get all EC2 instances and return the results.
-        """
-        return self.ec2.instances.all()
+    def get_all_instance_details(self) -> list:
+        instances = self.ec2.instances.all()
+        instanceList = []
+        for instance in instances:
+            for tag in instance.tags:
+                if tag["Key"] == "Name":
+                    name = tag["Value"]
+                """If backup tag exists, check if yes"""
+                if tag["Key"].lower() == "backup" and tag["Value"].lower() == "yes":
+                    backup = True
+                else:
+                    backup = False
+
+            for volume in instance.block_device_mappings:
+                volumeCount = len(instance.block_device_mappings)
+
+            instance = {
+                "ID": instance.id,
+                "NAME": name,
+                "TYPE": instance.instance_type,
+                "STATE": instance.state["Name"],
+                "PLATFORM": instance.platform_details,
+                "VOLS": volumeCount,
+                "BACKUP": backup,
+            }
+            print(instance)
+            instanceList.append(instance)
+        return instanceList
 
     def get_instance_ids(self) -> list:
         """
@@ -107,42 +130,13 @@ class EC2Instances:
             platformDetails.append(instance.platform_details)
         return platformDetails
 
-    def print_ec2_instances_to_csv(self) -> None:
-        """
-        Print all EC2 instances to a CSV file
-        """
-        print("Printing EC2 instances to a csv file")
-        instanceList = self.describe_instances()
-        with open("ec2_instances.csv", "w") as f:
-            f.write(
-                "Name,ID,Private IP,State,Instance Type,Platform Details,Volume Details\n"
-            )
-            for i in instanceList:
-                f.write(
-                    f"{i['Name']},{i['ID']},{i['Private IP']},{i['State']},{i['Instance Type']},{i['Platform Details']},{i['Volume Details']}\n"
-                )
-
     def describe_instances(self) -> list:
         """
         Describe all EC2 instances and return the results.
         """
-        instanceList = []
-        for instance in self.ec2.instances.all():
-            for tag in instance.tags:
-                if tag["Key"] == "Name":
-                    print(tag["Value"])
-                    name = tag["Value"]
-            i = {
-                "Name": name,
-                "ID": instance.id,
-                "Private IP": instance.private_ip_address,
-                "State": instance.state,
-                "Instance Type": instance.instance_type,
-                "Platform Details": instance.platform,
-                "Volume Details": instance.block_device_mappings,
-            }
-        instanceList.append(i)
-        return instanceList
+        instances = self.ec2.instances.all()
+
+        return instances
 
     def describe_running_windows_instances(self) -> list:
         """
@@ -222,68 +216,20 @@ class EC2Instances:
                 instanceList.append(i)
         return instanceList
 
-    def report(self) -> list:
-
-        REPORT_DETAILS = []
-        TOTAL_INSTANCE_COUNT = self.get_total_instance_count()
-        print("TOTAL_INSTANCE_COUNT:", self.get_total_instance_count())
-        INSTANCES = []
-        for i in self.get_instances_object():
-            print("INSTANCE_ID:", i.id)
-            ID = i.id
-            for tag in i.tags:
-                if tag["Key"] == "Name":
-                    print("NAME:", tag["Value"])
-                    NAME = tag["Value"]
-            print("INSTANCE_TYPE:", i.instance_type)
-            TYPE = i.instance_type
-            print("ARCHITECTURE:", i.architecture)
-            ARCH = i.architecture
-            print("PLATFORM_DETAILS:", i.platform_details)
-            PLATFORM = i.platform_details
-            print("PRIVATE_IP:", i.private_ip_address)
-            PRIVATE_IP = i.private_ip_address
-            if i.public_ip_address:
-                print("PUBLIC_IP:", i.public_ip_address)
-                PUBLIC_IP = i.public_ip_address
-            else:
-                print("PUBLIC_IP:", "None")
-                PUBLIC_IP = "N/A"
-            print("STATE:", i.state["Name"])
-            STATE = i.state
-            print("VOLUMES:", f"{len([volume for volume in i.volumes.all()])}")
-            iVolumes = []
-            for volume in i.volumes.all():
-                print("\t-VOLUME_ID:", volume.id)
-                VOLUME_ID = volume.id
-                print("\t-VOLUME_SIZE:", volume.size)
-                VOLUME_SIZE = volume.size
-                for tag in volume.tags:
-                    if tag["Key"] == "Name":
-                        print("\t-VOLUME_NAME:", tag["Value"])
-                        VOLUME_NAME = tag["Value"]
-                iVolumes.append(
-                    {
-                        "Volume ID": VOLUME_ID,
-                        "Volume Size": VOLUME_SIZE,
-                        "Volume Name": VOLUME_NAME,
-                    }
-                )
-            INSTANCES.append(
-                {
-                    "ID": ID,
-                    "Name": NAME,
-                    "Instance Type": TYPE,
-                    "Architecture": ARCH,
-                    "Platform Details": PLATFORM,
-                    "Private IP": PRIVATE_IP,
-                    "Public IP": PUBLIC_IP,
-                    "State": STATE,
-                    "Volumes": iVolumes,
-                }
+    def print_ec2_instances_to_csv(self) -> None:
+        """
+        Print all EC2 instances to a CSV file
+        """
+        print("Printing EC2 instances to a csv file")
+        instanceList = self.describe_instances()
+        with open("ec2_instances.csv", "w") as f:
+            f.write(
+                "Name,ID,Private IP,State,Instance Type,Platform Details,Volume Details\n"
             )
-        REPORT_DETAILS.append({"total": TOTAL_INSTANCE_COUNT, "instances": INSTANCES})
-        return REPORT_DETAILS
+            for i in instanceList:
+                f.write(
+                    f"{i['Name']},{i['ID']},{i['Private IP']},{i['State']},{i['Instance Type']},{i['Platform Details']},{i['Volume Details']}\n"
+                )
 
 
 def main():
@@ -291,8 +237,7 @@ def main():
     Main function
     """
     ec2 = EC2Instances()
-    win = ec2.get_platform_counts()
-    print(win)
+    ec2.get_all_instance_details()
 
 
 if __name__ == "__main__":
