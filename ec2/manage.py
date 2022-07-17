@@ -132,19 +132,26 @@ def print_report():
     platforms = manager.instances.get_platform_counts()
 
     """Prints a report to a markdown file"""
-
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     WINDOWS_RUNNING = manager.instances.describe_running_windows_instances()
     LINUX_RUNNING = manager.instances.describe_running_linux_instances()
     attachedVolCount = manager.get_attached_volume_count()
     unattachedVolCount = manager.get_unattached_volume_count()
     with open("report.md", "w") as f:
-        f.write("# XATOR AWS EC2 REPORT\n\n")
+        f.write(
+            "# ![logo](https://www.xatorcorp.com/static/images/logos/logo_xator-color_249x70.png)AWS EC2 REPORT\n\n"
+        )
 
         """Instance Information"""
-
-        f.write("## INSTANCES Total: {}\n\n".format(manager.get_total_instance_count()))
+        f.write(
+            "## ![ec2logo](https://grosventre-public.s3.us-west-2.amazonaws.com/report_images/aws_images/Arch_Amazon-EC2_32.png)Elastic Compute Cloud (EC2)\n\n"
+        )
+        f.write("---\n\n")
+        f.write(
+            "### INSTANCES Total: {}\n\n".format(manager.get_total_instance_count())
+        )
         f.write("| Windows | Linux |\n|:---|:---|\n")
-        f.write(f"| {platforms.get('Windows')} | {platforms.get('Linux')} |  | |\n")
+        f.write(f"| {platforms.get('Windows')} | {platforms.get('Linux')} |\n")
         f.write(
             f"\n### INSTANCES Running Total: {manager.instances.get_total_running_instances()}\n\n---\n\n"
         )
@@ -152,31 +159,38 @@ def print_report():
             "| Instance ID | Name | Type | State | Platform | Volumes | Backed up? |\n|:---|:---|:---|:---|:---|:---|:---|\n"
         )
         for i in instances:
-            f.write(
-                f"| {i['ID']}| {i['NAME']} | {i['TYPE']} | {i['STATE']} | {i['PLATFORM']} | {i['VOLS']} | {i['BACKUP']} |\n"
-            )
+            if i["STATE"] == "running":
+                f.write(
+                    f"| {i['ID']}| {i['NAME']} | {i['TYPE']} | {i['STATE']} | {i['PLATFORM']} | {i['VOLS']} | {i['BACKUP']} |\n"
+                )
         f.write(
             f"\n### INSTANCES Stopped Total: {manager.instances.get_total_stopped_instances()}\n\n---\n\n"
         )
+        f.write(
+            "| Instance ID | Name | Type | State | Platform | Volumes | Backed up? |\n|:---|:---|:---|:---|:---|:---|:---|\n"
+        )
         if len(manager.instances.describe_stopped_instances()) > 0:
-            for i in manager.instances.describe_stopped_instances():
-                f.write(
-                    f"| {i['Name']} | {i['ID']} | {i['Private IP']} | {i['State']} | {i['Instance Type']} | {i['Platform Details']} |\n"
-                )
+            for i in instances:
+                if i["STATE"] == "stopped":
+                    f.write(
+                        f"| {i['ID']}| {i['NAME']} | {i['TYPE']} | {i['STATE']} | {i['PLATFORM']} | {i['VOLS']} | {i['BACKUP']} |\n"
+                    )
         else:
             f.write("No stopped instances found")
-        f.write("\n\n")
+        f.write("\n")
 
         """Volume Information"""
-
-        f.write(f"## VOLUMES Total: {manager.get_total_volume_count()}\n\n---\n\n")
+        f.write(
+            "## ![ebslogo](https://grosventre-public.s3.us-west-2.amazonaws.com/report_images/aws_images/Arch_Amazon-Elastic-Block-Store_32.png)Elastic Block Store (EBS)\n\n"
+        )
+        f.write(f"### VOLUMES Total: {manager.get_total_volume_count()}\n\n---\n\n")
         f.write(
             "| Total Storage | Volumes attached | Volumes unattached |\n|:---|:---|:---|\n"
         )
         f.write(
             f"| {manager.get_total_volume_size()} GB | {attachedVolCount} | {unattachedVolCount} |\n"
         )
-        f.write("\n## VOLUMES Attached\n\n---\n\n")
+        f.write("\n### VOLUMES Attached\n\n---\n\n")
         f.write("| Volume ID | Size | Availability Zone |\n|:---|:---|:---|\n")
         if attachedVolCount == 0:
             f.write("No volumes attached\n")
@@ -184,7 +198,10 @@ def print_report():
             if attachedVolCount > 0:
                 for i in manager.get_attached_volumes():
                     f.write(f"| {i.id} | {i.size} GB | {i.availability_zone} |\n")
-        f.write("\n## VOLUMES Unattached\n\n---\n\n")
+        f.write("\n### VOLUMES Unattached\n\n---\n\n")
+        f.write(
+            "| Total Storage | Volumes attached | Volumes unattached |\n|:---|:---|:---|\n"
+        )
         if unattachedVolCount == 0:
             f.write("No volumes unattached\n")
         else:
@@ -195,14 +212,17 @@ def print_report():
         """Snapshot Information"""
 
         f.write(
-            f"\n## SNAPSHOTS Total: {manager.get_total_snapshot_count()}\n\n---\n\n"
+            f"\n### SNAPSHOTS Total: {manager.get_total_snapshot_count()}\n\n---\n\n"
         )
         f.write("| Volume ID | Snapshot Count |\n|:---|:---|\n")
         for volume in manager.get_volume_ids():
             f.write(
                 f"| {volume} | {manager.snapshots.get_snapshot_count_by_volume_id(volume)} |\n"
             )
-        f.write("\nDate: " + str(datetime.now()) + "\n")
+        f.write("---\n\n")
+        f.write(
+            "Report compiled by Justin Moore for Skip Davidson on: " + timestamp + "\n"
+        )
 
 
 def main():

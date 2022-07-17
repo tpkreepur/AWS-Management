@@ -1,7 +1,7 @@
-from re import I
 import boto3
 import sys
 import json
+import csv
 
 
 class EC2Instances:
@@ -218,18 +218,47 @@ class EC2Instances:
 
     def print_ec2_instances_to_csv(self) -> None:
         """
-        Print all EC2 instances to a CSV file
+        Print all EC2 instance details to a CSV file
         """
-        print("Printing EC2 instances to a csv file")
-        instanceList = self.describe_instances()
-        with open("ec2_instances.csv", "w") as f:
-            f.write(
-                "Name,ID,Private IP,State,Instance Type,Platform Details,Volume Details\n"
-            )
-            for i in instanceList:
-                f.write(
-                    f"{i['Name']},{i['ID']},{i['Private IP']},{i['State']},{i['Instance Type']},{i['Platform Details']},{i['Volume Details']}\n"
+        print("Printing all EC2 instance details to CSV file...")
+        instances = self.ec2.instances.all()
+        with open("ec2_instances.csv", "w") as csvfile:
+            fieldnames = [
+                "ID",
+                "NAME",
+                "TYPE",
+                "STATE",
+                "PUBLIC IP",
+                "PRIVATE IP",
+                "PLATFORM",
+                "VPC",
+                "SUBNET",
+                "VOLUMES",
+            ]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for instance in instances:
+                for tag in instance.tags:
+                    if tag["Key"] == "Name":
+                        name = tag["Value"]
+                    else:
+                        name = "No Name Assigned"
+
+                writer.writerow(
+                    {
+                        "ID": instance.id,
+                        "NAME": name,
+                        "TYPE": instance.instance_type,
+                        "STATE": instance.state["Name"],
+                        "PUBLIC IP": instance.public_ip_address,
+                        "PRIVATE IP": instance.private_ip_address,
+                        "PLATFORM": instance.platform_details,
+                        "VPC": instance.vpc_id,
+                        "SUBNET": instance.subnet_id,
+                        "VOLUMES": instance.block_device_mappings,
+                    }
                 )
+        print("Done.")
 
 
 def main():
@@ -237,7 +266,7 @@ def main():
     Main function
     """
     ec2 = EC2Instances()
-    ec2.get_all_instance_details()
+    ec2.print_ec2_instances_to_csv()
 
 
 if __name__ == "__main__":

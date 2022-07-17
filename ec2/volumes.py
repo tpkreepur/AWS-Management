@@ -38,27 +38,7 @@ class EC2Volumes:
 
     def print_all_volumes_to_csv(self):
         """Prints all volume information to a csv file"""
-        print("Printing all volume information to csv file")
-        with open("volumes.csv", "w") as f:
-            f.write(
-                "Volume Name,Volume ID,Volume Type,Volume Size(GB),Volume State,Volume Availability Zone,Volume Encrypted,Volume Snapshot ID,Volume Iops,Volume Tags\n"
-            )
-            for volume in self.volumes:
-                f.write(
-                    "{},{},{},{},{},{},{},{},{},{}\n".format(
-                        volume.tags[0]["Value"],
-                        volume.id,
-                        volume.volume_type,
-                        volume.size,
-                        volume.state,
-                        volume.availability_zone,
-                        volume.encrypted,
-                        volume.snapshot_id,
-                        volume.iops,
-                        volume.tags,
-                    )
-                )
-        print("Done printing to csv file")
+        
 
     def get_volumes(self) -> list:
         """Returns a list of all volumes"""
@@ -112,7 +92,7 @@ class EC2Volumes:
     def get_attached_volumes(self) -> list:
         """Returns a list of all volumes attached to an instance"""
         volumes = []
-        
+
         for v in self.volumes:
             if v.attachments:
                 volumes.append(v)
