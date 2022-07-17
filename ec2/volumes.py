@@ -102,6 +102,35 @@ class EC2Volumes:
             if v.id == volume_id:
                 return f"{v.size} GB"
 
+    def get_total_volume_size(self) -> int:
+        """Returns the total size of all volumes"""
+        total_size = 0
+        for v in self.volumes:
+            total_size += v.size
+        return total_size
+
+    def get_attached_volumes(self) -> list:
+        """Returns a list of all volumes attached to an instance"""
+        volumes = []
+        
+        for v in self.volumes:
+            if v.attachments:
+                volumes.append(v)
+
+        return volumes
+
+    def get_unattached_volumes(self) -> list:
+        """Returns a list of all volumes unattached to an instance"""
+        if self.volumes:
+            volumes = []
+            for v in self.volumes:
+                if not v.attachments:
+                    volumes.append(v)
+
+            return volumes
+        else:
+            return None
+
 
 def test_print_functions():
     ec2_volumes = EC2Volumes()
@@ -113,7 +142,7 @@ def test_print_functions():
 
 def main():
     ec2_volumes = EC2Volumes()
-    ec2_volumes.describe_volumes()
+    print(ec2_volumes.get_unattached_volumes())
 
 
 if __name__ == "__main__":
