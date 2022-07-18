@@ -2,6 +2,7 @@ import boto3
 import sys
 import json
 import csv
+from volumes import EC2Volumes
 
 
 class EC2Instances:
@@ -40,25 +41,22 @@ class EC2Instances:
     def get_all_instance_details(self) -> list:
         instances = self.ec2.instances.all()
         instanceList = []
+        backups = []
         for instance in instances:
             for tag in instance.tags:
                 if tag["Key"] == "Name":
                     name = tag["Value"]
             volumeCount = len(instance.block_device_mappings)
             for volume in instance.volumes.all():
+                backup = EC2Volumes().get_volume_backup_status(volume.id)
+                backups.append(backup)
 
-                for tag in volume.tags:
-                    if (
-                        tag["Key"].lower() == "snapshot"
-                        or tag["Key"].lower() == "backup"
-                    ):
-                        backup = (
-                            True
-                            if tag["Value"] == "1" or tag["Value"] == "yes"
-                            else False
-                        )
-                    else:
-                        backup = False
+                if True in backups:
+                    backupStatus = "True"
+                else:
+                    backupStatus = "False"
+
+            print(backupStatus)
             instance = {
                 "ID": instance.id,
                 "NAME": name,
@@ -66,7 +64,7 @@ class EC2Instances:
                 "STATE": instance.state["Name"],
                 "PLATFORM": instance.platform_details,
                 "VOLS": volumeCount,
-                "BACKUP": backup,
+                "BACKUP": backupStatus,
             }
             instanceList.append(instance)
         return instanceList

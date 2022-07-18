@@ -52,6 +52,24 @@ class EC2Volumes:
 
         return volumes
 
+    def get_volume_backup_status(self, volume_id: str) -> str:
+        oldBackupPolicy = None
+        newSnapshotPolicy = None
+
+        for volume in self.volumes:
+            if volume.id == volume_id:
+                for tag in volume.tags:
+                    if tag["Key"].lower() == "backup":
+                        oldBackupPolicy = True
+                    if tag["Key"].lower() == "snapshot":
+                        newSnapshotPolicy = True
+                if oldBackupPolicy and newSnapshotPolicy:
+                    print("Backups are set")
+                    return True
+                else:
+                    print("Backups are not set")
+                    return False
+
     def get_total_volume_count(self) -> int:
         """Returns the total number of volumes"""
         print("Total number of volumes: ", len(self.volumes))
@@ -106,6 +124,7 @@ class EC2Volumes:
             return volumes
         else:
             return None
+
 
 def main():
     ec2_volumes = EC2Volumes()

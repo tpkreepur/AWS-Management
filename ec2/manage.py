@@ -154,18 +154,18 @@ def print_report():
             f"\n### INSTANCES Running Total: {manager.instances.get_total_running_instances()}\n\n---\n\n"
         )
         f.write(
-            "| Instance ID | Name | Type | State | Platform | Volumes | Backed up? |\n|:---|:---|:---|:---|:---|:---|:---|\n"
+            "| Instance ID | Name | Type | State | Platform | Volumes |\n|:---|:---|:---|:---|:---|:---|\n"
         )
         for i in instances:
             if i["STATE"] == "running":
                 f.write(
-                    f"| {i['ID']}| {i['NAME']} | {i['TYPE']} | {i['STATE']} | {i['PLATFORM']} | {i['VOLS']} | {i['BACKUP']} |\n"
+                    f"| {i['ID']}| {i['NAME']} | {i['TYPE']} | {i['STATE']} | {i['PLATFORM']} | {i['VOLS']} |\n"
                 )
         f.write(
             f"\n### INSTANCES Stopped Total: {manager.instances.get_total_stopped_instances()}\n\n---\n\n"
         )
         f.write(
-            "| Instance ID | Name | Type | State | Platform | Volumes | Backed up? |\n|:---|:---|:---|:---|:---|:---|:---|\n"
+            "| Instance ID | Name | Type | State | Platform | Volumes |\n|:---|:---|:---|:---|:---|:---|\n"
         )
         if len(manager.instances.describe_stopped_instances()) > 0:
             for i in instances:
@@ -220,9 +220,10 @@ def print_report():
         )
         f.write("| Volume ID | Volume Name |Snapshot Count |\n|:---|:---|:---|\n")
         for volume in manager.get_volume_ids():
-            f.write(
-                f"| {volume} | {manager.volumes.get_volume_name(volume)} | {manager.snapshots.get_snapshot_count_by_volume_id(volume)} |\n"
-            )
+            if manager.snapshots.get_snapshot_count_by_volume_id(volume) > 0:
+                f.write(
+                    f"| {volume} | {manager.volumes.get_volume_name(volume)} | {manager.snapshots.get_snapshot_count_by_volume_id(volume)} |\n"
+                )
         f.write("---\n\n")
         f.write(
             "Report compiled by Justin Moore for Skip Davidson on: " + timestamp + "\n"
