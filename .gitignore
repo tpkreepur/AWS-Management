@@ -196,3 +196,13 @@ report.pdf
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 
+# Node.js and Next.js
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
+dashboard/build/
+dashboard/.env*
+dashboard/npm-debug.log*
+dashboard/yarn-debug.log*
+dashboard/yarn-error.log*
+
