@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { EC2Stats, LoadingState } from "@/types";
-import { awsEC2Service } from "@/services";
 import { createUserFriendlyErrorMessage } from "@/lib/error-messages";
 
 /**
@@ -25,7 +24,11 @@ export function useEC2Stats() {
     const fetchEC2Stats = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsEC2Service.getEC2Stats();
+        const response = await fetch("/api/aws/ec2");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
         setEC2Stats(data);
       } catch (error) {
         setLoadingState({
@@ -44,7 +47,11 @@ export function useEC2Stats() {
     const fetchEC2Stats = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsEC2Service.getEC2Stats();
+        const response = await fetch("/api/aws/ec2");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
         setEC2Stats(data);
       } catch (error) {
         setLoadingState({

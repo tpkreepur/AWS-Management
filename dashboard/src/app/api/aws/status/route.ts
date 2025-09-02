@@ -1,22 +1,24 @@
-import { createAPISuccessResponse } from "@/lib/api-error-handler";
+import { NextResponse } from "next/server";
+import { AWSConfigService } from "@/services";
 
 export async function GET() {
-  const profile = process.env.AWS_PROFILE;
-  const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
+  try {
+    const config = await AWSConfigService.getInstance();
 
-  const isRealAWS = !!(
-    profile ||
-    (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) ||
-    region
-  );
+    return NextResponse.json({
+      isConnected: true,
+      profile: process.env.AWS_PROFILE,
+      region: config.region || process.env.AWS_REGION || "us-east-1",
+    });
+  } catch (error) {
+    console.error("AWS Status Check Error:", error);
 
-  const statusData = {
-    mode: isRealAWS ? "Real AWS" : "Mock",
-    profile,
-    region,
-    hasCredentials: isRealAWS,
-  };
-
-  // Status endpoint doesn't use AWS APIs, so it always uses 'mock' as source
-  return createAPISuccessResponse(statusData, "mock");
+    return NextResponse.json(
+      {
+        isConnected: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 200 }
+    ); // Return 200 to avoid fetch errors in client
+  }
 }

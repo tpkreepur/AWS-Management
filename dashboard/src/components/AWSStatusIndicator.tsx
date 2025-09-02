@@ -1,94 +1,105 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { awsStatusService } from "@/services";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AlertCircle, CheckCircle, Clock } from "lucide-react";
 
-interface ServiceInfo {
-  mode: string;
+interface AWSStatus {
+  isConnected: boolean;
   profile?: string;
   region?: string;
-  hasCredentials: boolean;
+  error?: string;
 }
 
-/**
- * Displays the current AWS connection status (real or mock) as a badge, including profile and region info.
- * Fetches service info using awsStatusService.
- * @returns {JSX.Element} The rendered status indicator badge.
- */
-export function AWSStatusIndicator() {
-  const [serviceInfo, setServiceInfo] = useState<ServiceInfo>({
-    mode: "Loading...",
-    hasCredentials: false,
-  });
-  const [isLoading, setIsLoading] = useState(true);
+export default function AWSStatusIndicator() {
+  const [status, setStatus] = useState<AWSStatus | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchServiceInfo = async () => {
+    const checkAWSStatus = async () => {
       try {
-        const info = await awsStatusService.getServiceInfo();
-        setServiceInfo(info);
+        const response = await fetch("/api/aws/status");
+        const data = await response.json();
+        setStatus(data);
       } catch (error) {
-        console.error("Error fetching service info:", error);
-        setServiceInfo({
-          mode: "Error",
-          hasCredentials: false,
+        setStatus({
+          isConnected: false,
+          error: "Failed to check AWS status",
         });
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchServiceInfo();
+    checkAWSStatus();
   }, []);
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <Badge variant="secondary" className="animate-pulse">
-        <div className="w-2 h-2 rounded-full mr-2 bg-muted-foreground/50" />
-        Loading...
-      </Badge>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">AWS Connection</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">Checking...</div>
+        </CardContent>
+      </Card>
     );
   }
 
-  const isRealAWS = serviceInfo.mode === "Real AWS";
+  if (!status) {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">AWS Connection</CardTitle>
+          <AlertCircle className="h-4 w-4 text-destructive" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-destructive">Error</div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Unable to check status
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="flex items-center gap-2">
-      <Badge
-        variant={isRealAWS ? "default" : "secondary"}
-        className={`flex items-center gap-2 ${
-          isRealAWS
-            ? "bg-green-100 text-green-800 hover:bg-green-200 border-green-200 dark:bg-green-950 dark:text-green-400"
-            : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-400"
-        }`}
-      >
-        <div
-          className={`w-2 h-2 rounded-full ${
-            isRealAWS ? "bg-green-500" : "bg-yellow-500"
-          }`}
-        />
-
-        <span className="font-medium">{serviceInfo.mode}</span>
-
-        {serviceInfo.profile && (
-          <span className="text-xs opacity-75">
-            Profile: {serviceInfo.profile}
-          </span>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">AWS Connection</CardTitle>
+        {status.isConnected ? (
+          <CheckCircle className="h-4 w-4 text-green-600" />
+        ) : (
+          <AlertCircle className="h-4 w-4 text-destructive" />
         )}
-
-        {serviceInfo.region && (
-          <span className="text-xs opacity-75">
-            Region: {serviceInfo.region}
-          </span>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">
+          <Badge variant={status.isConnected ? "default" : "destructive"}>
+            {status.isConnected ? "Connected" : "Disconnected"}
+          </Badge>
+        </div>
+        {status.isConnected && (
+          <div className="mt-2 space-y-1">
+            {status.profile && (
+              <p className="text-xs text-muted-foreground">
+                Profile: {status.profile}
+              </p>
+            )}
+            {status.region && (
+              <p className="text-xs text-muted-foreground">
+                Region: {status.region}
+              </p>
+            )}
+          </div>
         )}
-
-        {!isRealAWS && (
-          <span className="text-xs opacity-75">
-            (Set AWS_PROFILE for real data)
-          </span>
+        {status.error && (
+          <p className="text-xs text-destructive mt-1">{status.error}</p>
         )}
-      </Badge>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,185 +1,37 @@
 import { AccountInfo, EC2Stats, QuickAction } from "@/types";
-import { awsHttpClient } from "@/lib/http-client";
-import {
-  FaRocket,
-  FaCamera,
-  FaHdd,
-  FaSync,
-  FaDollarSign,
-  FaLock,
-} from "react-icons/fa";
+import { awsAccountService } from "./aws-account.service";
+import { awsEC2Service } from "./aws-ec2.service";
+import { awsQuickActionsService } from "./aws-quick-actions.service";
+import { awsStatusService } from "./aws-status.service";
 
-// Client-side AWS data service that calls API routes
+// Client-side AWS data service that delegates to specialized services
 export class AWSDataService {
   /**
-   * Fetches AWS account information from the API route.
+   * Fetches AWS account information via the account service.
    * @returns {Promise<AccountInfo>} The AWS account info object.
    */
   async getAccountInfo(): Promise<AccountInfo> {
-    return awsHttpClient.get<AccountInfo>("/account", "account information");
+    return awsAccountService.getAccountInfo();
   }
 
   /**
-   * Fetches EC2 statistics from the API route.
+   * Fetches EC2 statistics via the EC2 service.
    * @returns {Promise<EC2Stats>} The EC2 statistics object.
    */
   async getEC2Stats(): Promise<EC2Stats> {
-    return awsHttpClient.get<EC2Stats>("/ec2", "EC2 statistics");
+    return awsEC2Service.getEC2Stats();
   }
 
   /**
-   * Returns a list of available quick actions, with mock or real AWS labels based on current mode.
+   * Returns a list of available quick actions via the quick actions service.
    * @returns {Promise<QuickAction[]>} Array of quick action objects.
    */
   async getQuickActions(): Promise<QuickAction[]> {
-    // Get service status to determine if actions should be enabled
-    const status = await this.getServiceInfo();
-    const isRealAWS = status.mode === "Real AWS";
-
-    return [
-      {
-        id: "launch-instance",
-        title: isRealAWS ? "Launch Instance" : "Launch Instance (Mock)",
-        description: isRealAWS
-          ? "Launch new EC2 instance"
-          : "Mock: Launch new EC2 instance",
-        icon: FaRocket,
-        color: "bg-blue-500 hover:bg-blue-600",
-        action: this.launchInstance.bind(this),
-        enabled: true,
-      },
-      {
-        id: "view-snapshots",
-        title: isRealAWS ? "View Snapshots" : "View Snapshots (Mock)",
-        description: isRealAWS
-          ? "Manage EBS snapshots"
-          : "Mock: Manage EBS snapshots",
-        icon: FaCamera,
-        color: "bg-green-500 hover:bg-green-600",
-        action: this.viewSnapshots.bind(this),
-        enabled: true,
-      },
-      {
-        id: "manage-volumes",
-        title: isRealAWS ? "Manage Volumes" : "Manage Volumes (Mock)",
-        description: isRealAWS
-          ? "Manage EBS volumes"
-          : "Mock: Manage EBS volumes",
-        icon: FaHdd,
-        color: "bg-purple-500 hover:bg-purple-600",
-        action: this.manageVolumes.bind(this),
-        enabled: true,
-      },
-      {
-        id: "backup-status",
-        title: isRealAWS ? "Backup Status" : "Backup Status (Mock)",
-        description: isRealAWS
-          ? "Check backup status"
-          : "Mock: Check backup status",
-        icon: FaSync,
-        color: "bg-orange-500 hover:bg-orange-600",
-        action: this.checkBackupStatus.bind(this),
-        enabled: true,
-      },
-      {
-        id: "cost-analysis",
-        title: isRealAWS ? "Cost Analysis" : "Cost Analysis (Mock)",
-        description: isRealAWS
-          ? "View cost analysis"
-          : "Mock: View cost analysis",
-        icon: FaDollarSign,
-        color: "bg-yellow-500 hover:bg-yellow-600",
-        action: this.viewCostAnalysis.bind(this),
-        enabled: true,
-      },
-      {
-        id: "security-groups",
-        title: isRealAWS ? "Security Groups" : "Security Groups (Mock)",
-        description: isRealAWS
-          ? "Manage security groups"
-          : "Mock: Manage security groups",
-        icon: FaLock,
-        color: "bg-red-500 hover:bg-red-600",
-        action: this.manageSecurityGroups.bind(this),
-        enabled: true,
-      },
-    ];
+    return awsQuickActionsService.getQuickActions();
   }
 
-  // Action handlers
-  private async launchInstance(): Promise<void> {
-    const status = await this.getServiceInfo();
-    if (status.mode === "Real AWS") {
-      console.log("Launching new EC2 instance...");
-      alert(
-        "Launch Instance functionality would be implemented here (real AWS mode)"
-      );
-    } else {
-      console.log("Mock: Launching new EC2 instance...");
-      alert("Mock mode: Set AWS_PROFILE to use real AWS functionality");
-    }
-  }
-
-  private async viewSnapshots(): Promise<void> {
-    const status = await this.getServiceInfo();
-    if (status.mode === "Real AWS") {
-      console.log("Viewing EBS snapshots...");
-      alert("Snapshot management would be implemented here (real AWS mode)");
-    } else {
-      console.log("Mock: Viewing EBS snapshots...");
-      alert("Mock mode: Set AWS_PROFILE to use real AWS functionality");
-    }
-  }
-
-  private async manageVolumes(): Promise<void> {
-    const status = await this.getServiceInfo();
-    if (status.mode === "Real AWS") {
-      console.log("Opening volume management...");
-      alert("Volume management would be implemented here (real AWS mode)");
-    } else {
-      console.log("Mock: Opening volume management...");
-      alert("Mock mode: Set AWS_PROFILE to use real AWS functionality");
-    }
-  }
-
-  private async checkBackupStatus(): Promise<void> {
-    const status = await this.getServiceInfo();
-    if (status.mode === "Real AWS") {
-      console.log("Checking backup status...");
-      alert("Backup status check would be implemented here (real AWS mode)");
-    } else {
-      console.log("Mock: Checking backup status...");
-      alert("Mock mode: Set AWS_PROFILE to use real AWS functionality");
-    }
-  }
-
-  private async viewCostAnalysis(): Promise<void> {
-    const status = await this.getServiceInfo();
-    if (status.mode === "Real AWS") {
-      console.log("Opening cost analysis...");
-      alert("Cost analysis would be implemented here (real AWS mode)");
-    } else {
-      console.log("Mock: Opening cost analysis...");
-      alert("Mock mode: Set AWS_PROFILE to use real AWS functionality");
-    }
-  }
-
-  private async manageSecurityGroups(): Promise<void> {
-    const status = await this.getServiceInfo();
-    if (status.mode === "Real AWS") {
-      console.log("Managing security groups...");
-      alert(
-        "Security group management would be implemented here (real AWS mode)"
-      );
-    } else {
-      console.log("Mock: Managing security groups...");
-      alert("Mock mode: Set AWS_PROFILE to use real AWS functionality");
-    }
-  }
-
-  // Public method to get current configuration info
   /**
-   * Gets current service configuration info (mode, profile, region, credentials).
+   * Gets current service configuration info via the status service.
    * @returns {Promise<{mode: string; profile?: string; region?: string; hasCredentials: boolean}>} Service info object.
    */
   async getServiceInfo(): Promise<{
@@ -188,25 +40,24 @@ export class AWSDataService {
     region?: string;
     hasCredentials: boolean;
   }> {
-    try {
-      return await awsHttpClient.get("/status", "service configuration");
-    } catch (error) {
-      console.error("Error fetching service info:", error);
-      return {
-        mode: "Mock",
-        hasCredentials: false,
-      };
-    }
+    return awsStatusService.getServiceInfo();
   }
 
-  // Public method to check if using real AWS
   /**
-   * Checks if the app is using real AWS credentials and endpoints.
+   * Checks if the app is using real AWS via the status service.
    * @returns {Promise<boolean>} True if using real AWS, false otherwise.
    */
   async isUsingRealAWS(): Promise<boolean> {
-    const info = await this.getServiceInfo();
-    return info.mode === "Real AWS";
+    return awsStatusService.isUsingRealAWS();
+  }
+
+  /**
+   * Executes a quick action by ID via the quick actions service.
+   * @param {string} actionId - The ID of the action to execute.
+   * @returns {Promise<void>} Promise that resolves when action is complete.
+   */
+  async executeQuickAction(actionId: string): Promise<void> {
+    return awsQuickActionsService.executeAction(actionId);
   }
 }
 

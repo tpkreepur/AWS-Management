@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { AccountInfo, LoadingState } from "@/types";
-import { awsAccountService } from "@/services";
 import { createUserFriendlyErrorMessage } from "@/lib/error-messages";
 
 /**
@@ -25,7 +24,11 @@ export function useAccountInfo() {
     const fetchAccountInfo = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsAccountService.getAccountInfo();
+        const response = await fetch("/api/aws/account");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
         setAccountInfo(data);
       } catch (error) {
         setLoadingState({
@@ -44,7 +47,11 @@ export function useAccountInfo() {
     const fetchAccountInfo = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsAccountService.getAccountInfo();
+        const response = await fetch("/api/aws/account");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
         setAccountInfo(data);
       } catch (error) {
         setLoadingState({
