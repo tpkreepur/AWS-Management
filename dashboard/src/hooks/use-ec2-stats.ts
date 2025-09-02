@@ -30,7 +30,7 @@ export function useEC2Stats() {
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error: createUserFriendlyErrorMessage(error, 'ec2'),
+          error: createUserFriendlyErrorMessage(error, "ec2"),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));
@@ -49,7 +49,7 @@ export function useEC2Stats() {
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error: createUserFriendlyErrorMessage(error, 'ec2'),
+          error: createUserFriendlyErrorMessage(error, "ec2"),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));

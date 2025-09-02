@@ -31,7 +31,7 @@ export function useQuickActions() {
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error: createUserFriendlyErrorMessage(error, 'actions'),
+          error: createUserFriendlyErrorMessage(error, "actions"),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));
@@ -58,7 +58,7 @@ export function useQuickActions() {
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error: createUserFriendlyErrorMessage(error, 'actions'),
+          error: createUserFriendlyErrorMessage(error, "actions"),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));

@@ -10,7 +10,7 @@ export class AWSEC2Service {
    * @returns {Promise<EC2Stats>} The EC2 statistics object.
    */
   async getEC2Stats(): Promise<EC2Stats> {
-    return awsHttpClient.get<EC2Stats>('/ec2', 'EC2 statistics');
+    return awsHttpClient.get<EC2Stats>("/ec2", "EC2 statistics");
   }
 }
 

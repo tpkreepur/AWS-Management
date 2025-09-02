@@ -4,7 +4,10 @@ import {
   GetAccountInformationCommand,
   GetContactInformationCommand,
 } from "@aws-sdk/client-account";
-import { handleAPIError, createAPISuccessResponse } from "@/lib/api-error-handler";
+import {
+  handleAPIError,
+  createAPISuccessResponse,
+} from "@/lib/api-error-handler";
 import { awsConfig } from "@/services/aws-config.service";
 
 export async function GET() {
@@ -16,9 +19,9 @@ export async function GET() {
     // Initialize Account client with the same configuration
     const accountClient = new AccountClient({
       region: config.region,
-      ...(config.profile && { 
-        credentials: awsConfig.getSTSClient().config.credentials 
-      })
+      ...(config.profile && {
+        credentials: awsConfig.getSTSClient().config.credentials,
+      }),
     });
 
     // Get caller identity for basic account info
@@ -53,7 +56,7 @@ export async function GET() {
         : "No",
     };
 
-    return createAPISuccessResponse(accountData, 'aws');
+    return createAPISuccessResponse(accountData, "aws");
   } catch (error) {
     // Define fallback mock data
     const config = awsConfig.getConfig();
@@ -64,6 +67,6 @@ export async function GET() {
       status: "Active" as const,
     };
 
-    return handleAPIError(error, mockData, 'account endpoint');
+    return handleAPIError(error, mockData, "account endpoint");
   }
 }

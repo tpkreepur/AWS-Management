@@ -16,7 +16,7 @@ export class AWSDataService {
    * @returns {Promise<AccountInfo>} The AWS account info object.
    */
   async getAccountInfo(): Promise<AccountInfo> {
-    return awsHttpClient.get<AccountInfo>('/account', 'account information');
+    return awsHttpClient.get<AccountInfo>("/account", "account information");
   }
 
   /**
@@ -24,7 +24,7 @@ export class AWSDataService {
    * @returns {Promise<EC2Stats>} The EC2 statistics object.
    */
   async getEC2Stats(): Promise<EC2Stats> {
-    return awsHttpClient.get<EC2Stats>('/ec2', 'EC2 statistics');
+    return awsHttpClient.get<EC2Stats>("/ec2", "EC2 statistics");
   }
 
   /**
@@ -189,7 +189,7 @@ export class AWSDataService {
     hasCredentials: boolean;
   }> {
     try {
-      return await awsHttpClient.get('/status', 'service configuration');
+      return await awsHttpClient.get("/status", "service configuration");
     } catch (error) {
       console.error("Error fetching service info:", error);
       return {

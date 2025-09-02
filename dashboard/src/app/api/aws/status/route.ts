@@ -18,5 +18,5 @@ export async function GET() {
   };
 
   // Status endpoint doesn't use AWS APIs, so it always uses 'mock' as source
-  return createAPISuccessResponse(statusData, 'mock');
+  return createAPISuccessResponse(statusData, "mock");
 }

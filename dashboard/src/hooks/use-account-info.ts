@@ -30,7 +30,7 @@ export function useAccountInfo() {
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error: createUserFriendlyErrorMessage(error, 'account'),
+          error: createUserFriendlyErrorMessage(error, "account"),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));
@@ -49,7 +49,7 @@ export function useAccountInfo() {
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error: createUserFriendlyErrorMessage(error, 'account'),
+          error: createUserFriendlyErrorMessage(error, "account"),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));

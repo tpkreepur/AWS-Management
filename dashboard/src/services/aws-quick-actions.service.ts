@@ -1,5 +1,8 @@
 import { QuickAction } from "@/types";
-import { createQuickActions, createMockActionHandlers } from "@/lib/quick-actions";
+import {
+  createQuickActions,
+  createMockActionHandlers,
+} from "@/lib/quick-actions";
 import { awsStatusService } from "./aws-status.service";
 
 /**
@@ -29,11 +32,13 @@ export class AWSQuickActionsService {
   async executeAction(actionId: string): Promise<void> {
     const actions = await this.getQuickActions();
     const action = actions.find((a) => a.id === actionId);
-    
+
     if (action && action.action) {
       await action.action();
     } else {
-      throw new Error(`Action with ID "${actionId}" not found or not available`);
+      throw new Error(
+        `Action with ID "${actionId}" not found or not available`
+      );
     }
   }
 }

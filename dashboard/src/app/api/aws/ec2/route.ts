@@ -1,5 +1,8 @@
 import { DescribeInstancesCommand } from "@aws-sdk/client-ec2";
-import { handleAPIError, createAPISuccessResponse } from "@/lib/api-error-handler";
+import {
+  handleAPIError,
+  createAPISuccessResponse,
+} from "@/lib/api-error-handler";
 import { awsConfig } from "@/services/aws-config.service";
 
 export async function GET() {
@@ -69,7 +72,7 @@ export async function GET() {
       terminated,
     };
 
-    return createAPISuccessResponse(ec2Data, 'aws');
+    return createAPISuccessResponse(ec2Data, "aws");
   } catch (error) {
     // Return mock data if AWS API fails
     const mockData = {
@@ -83,7 +86,7 @@ export async function GET() {
       terminated: 0,
     };
 
-    return handleAPIError(error, mockData, 'EC2 endpoint');
+    return handleAPIError(error, mockData, "EC2 endpoint");
   }
 }
 

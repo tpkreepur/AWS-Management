@@ -10,7 +10,7 @@ export class AWSAccountService {
    * @returns {Promise<AccountInfo>} The AWS account info object.
    */
   async getAccountInfo(): Promise<AccountInfo> {
-    return awsHttpClient.get<AccountInfo>('/account', 'account information');
+    return awsHttpClient.get<AccountInfo>("/account", "account information");
   }
 }
 

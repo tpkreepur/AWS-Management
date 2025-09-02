@@ -245,7 +245,7 @@ export class RealAWSDataService {
   }
 
   // Action handlers - these can be implemented to perform real AWS operations
-  
+
   /**
    * Launches a new EC2 instance with configurable parameters.
    * @returns {Promise<void>} Promise that resolves when the launch operation is complete
