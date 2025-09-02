@@ -73,7 +73,6 @@ Provides quick access buttons for common AWS management tasks:
 
 - View Snapshots
 
-
 ## Deployment
 
 ### Prerequisites
@@ -88,18 +87,22 @@ Before deploying, ensure you have:
 ### Environment Setup
 
 #### For Mock Data (No AWS Required)
+
 The app works out of the box with mock data - no additional setup needed.
 
 #### For Real AWS Data
+
 Set up AWS credentials using one of these methods:
 
 1. **AWS Profile (Recommended)**:
+
    ```bash
    aws configure --profile your-profile-name
    export AWS_PROFILE=your-profile-name
    ```
 
 2. **Environment Variables**:
+
    ```bash
    export AWS_ACCESS_KEY_ID=your_access_key
    export AWS_SECRET_ACCESS_KEY=your_secret_key
@@ -111,6 +114,7 @@ Set up AWS credentials using one of these methods:
 ### Required AWS Permissions
 
 For real AWS data, the application needs these IAM permissions:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -131,6 +135,7 @@ For real AWS data, the application needs these IAM permissions:
 ### Local Deployment
 
 1. **Clone and Setup**:
+
    ```bash
    git clone <repository-url>
    cd AWS-Management/dashboard
@@ -138,12 +143,15 @@ For real AWS data, the application needs these IAM permissions:
    ```
 
 2. **Development Mode**:
+
    ```bash
    npm run dev
    ```
+
    Visit http://localhost:3000
 
 3. **Production Build**:
+
    ```bash
    npm run build
    npm start
@@ -154,11 +162,13 @@ For real AWS data, the application needs these IAM permissions:
 #### Option 1: Vercel (Recommended for Next.js)
 
 1. **Install Vercel CLI**:
+
    ```bash
    npm install -g vercel
    ```
 
 2. **Deploy**:
+
    ```bash
    vercel --prod
    ```
@@ -171,6 +181,7 @@ For real AWS data, the application needs these IAM permissions:
 #### Option 2: Docker Deployment
 
 1. **Create Dockerfile**:
+
    ```dockerfile
    FROM node:18-alpine
    
@@ -186,6 +197,7 @@ For real AWS data, the application needs these IAM permissions:
    ```
 
 2. **Build and Run**:
+
    ```bash
    docker build -t aws-dashboard .
    docker run -p 3000:3000 \
@@ -200,12 +212,14 @@ For real AWS data, the application needs these IAM permissions:
 1. **Launch EC2 Instance** with appropriate security groups (port 3000)
 
 2. **Install Dependencies**:
+
    ```bash
    sudo apt update
    sudo apt install nodejs npm nginx
    ```
 
 3. **Deploy Application**:
+
    ```bash
    git clone <repository-url>
    cd AWS-Management/dashboard
@@ -214,6 +228,7 @@ For real AWS data, the application needs these IAM permissions:
    ```
 
 4. **Set up Process Manager**:
+
    ```bash
    npm install -g pm2
    pm2 start npm --name "aws-dashboard" -- start
@@ -222,11 +237,12 @@ For real AWS data, the application needs these IAM permissions:
    ```
 
 5. **Configure Nginx** (optional, for custom domain):
+
    ```nginx
    server {
        listen 80;
        server_name your-domain.com;
-       
+
        location / {
            proxy_pass http://localhost:3000;
            proxy_http_version 1.1;
@@ -247,29 +263,32 @@ For real AWS data, the application needs these IAM permissions:
 
 ### Environment Variables Reference
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `AWS_PROFILE` | AWS profile name to use | No |
-| `AWS_ACCESS_KEY_ID` | AWS access key | No* |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret key | No* |
-| `AWS_REGION` | AWS region (default: us-east-1) | No |
-| `AWS_DEFAULT_REGION` | Alternative to AWS_REGION | No |
+| Variable                | Description                     | Required |
+| ----------------------- | ------------------------------- | -------- |
+| `AWS_PROFILE`           | AWS profile name to use         | No       |
+| `AWS_ACCESS_KEY_ID`     | AWS access key                  | No*      |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key                  | No*      |
+| `AWS_REGION`            | AWS region (default: us-east-1) | No       |
+| `AWS_DEFAULT_REGION`    | Alternative to AWS_REGION       | No       |
 
 *Required only for real AWS data integration
 
 ### Troubleshooting Deployment
 
-**Build Fails**: 
+**Build Fails**:
+
 - Ensure Node.js version is 18+
 - Check TypeScript/ESLint errors: `npm run lint`
 - Fix any compilation errors before deploying
 
 **AWS Connection Issues**:
+
 - Verify AWS credentials: `aws sts get-caller-identity`
 - Check IAM permissions
 - Confirm region availability
 
 **Performance Issues**:
+
 - Enable caching in production
 - Consider using AWS CloudFront for static assets
 - Monitor AWS API rate limits
