@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { awsDataService } from "@/services/aws-data.service";
+import { Badge } from "@/components/ui/badge";
 
 interface ServiceInfo {
   mode: string;
@@ -38,48 +39,51 @@ export function AWSStatusIndicator() {
 
   if (isLoading) {
     return (
-      <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
-        <div className="w-2 h-2 rounded-full mr-2 bg-gray-400 animate-pulse"></div>
-        <span>Loading...</span>
-      </div>
+      <Badge variant="secondary" className="animate-pulse">
+        <div className="w-2 h-2 rounded-full mr-2 bg-muted-foreground/50" />
+        Loading...
+      </Badge>
     );
   }
 
   const isRealAWS = serviceInfo.mode === "Real AWS";
 
   return (
-    <div
-      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-        isRealAWS
-          ? "bg-green-100 text-green-800 border border-green-200"
-          : "bg-yellow-100 text-yellow-800 border border-yellow-200"
-      }`}
-    >
-      <div
-        className={`w-2 h-2 rounded-full mr-2 ${
-          isRealAWS ? "bg-green-500" : "bg-yellow-500"
+    <div className="flex items-center gap-2">
+      <Badge
+        variant={isRealAWS ? "default" : "secondary"}
+        className={`flex items-center gap-2 ${
+          isRealAWS
+            ? "bg-green-100 text-green-800 hover:bg-green-200 border-green-200 dark:bg-green-950 dark:text-green-400"
+            : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-400"
         }`}
-      ></div>
+      >
+        <div
+          className={`w-2 h-2 rounded-full ${
+            isRealAWS ? "bg-green-500" : "bg-yellow-500"
+          }`}
+        />
 
-      <span className="font-medium">{serviceInfo.mode}</span>
+        <span className="font-medium">{serviceInfo.mode}</span>
 
-      {serviceInfo.profile && (
-        <span className="ml-2 text-xs opacity-75">
-          Profile: {serviceInfo.profile}
-        </span>
-      )}
+        {serviceInfo.profile && (
+          <span className="text-xs opacity-75">
+            Profile: {serviceInfo.profile}
+          </span>
+        )}
 
-      {serviceInfo.region && (
-        <span className="ml-2 text-xs opacity-75">
-          Region: {serviceInfo.region}
-        </span>
-      )}
+        {serviceInfo.region && (
+          <span className="text-xs opacity-75">
+            Region: {serviceInfo.region}
+          </span>
+        )}
 
-      {!isRealAWS && (
-        <span className="ml-2 text-xs opacity-75">
-          (Set AWS_PROFILE for real data)
-        </span>
-      )}
+        {!isRealAWS && (
+          <span className="text-xs opacity-75">
+            (Set AWS_PROFILE for real data)
+          </span>
+        )}
+      </Badge>
     </div>
   );
 }

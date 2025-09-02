@@ -1,4 +1,5 @@
 // AWS-related type definitions
+import * as React from "react";
 
 export interface AccountInfo {
   accountId: string;
@@ -39,7 +40,7 @@ export interface QuickAction {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
   action: () => void | Promise<void>;
   enabled?: boolean;

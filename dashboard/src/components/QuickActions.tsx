@@ -1,6 +1,10 @@
 "use client";
 
 import { useQuickActions } from "@/hooks";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function QuickActions() {
   const { quickActions, isLoading, error, executeAction } = useQuickActions();
@@ -11,64 +15,74 @@ export function QuickActions() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Quick Actions
-        </h2>
-        <div className="animate-pulse">
-          <div className="grid grid-cols-1 gap-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-gray-100 p-3 rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-6 h-6 bg-gray-200 rounded mr-3"></div>
-                  <div>
-                    <div className="h-4 bg-gray-200 rounded w-24 mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-32"></div>
-                  </div>
+              <div key={i} className="flex items-center space-x-3">
+                <Skeleton className="h-9 w-9 rounded" />
+                <div className="flex-1">
+                  <Skeleton className="h-4 w-24 mb-1" />
+                  <Skeleton className="h-3 w-32" />
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Quick Actions
-        </h2>
-        <div className="text-red-600 text-sm">
-          <p>Error loading quick actions: {error}</p>
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertDescription>
+              Error loading quick actions: {error}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Quick Actions
-      </h2>
-      <div className="grid grid-cols-1 gap-3">
-        {quickActions.map((action) => (
-          <button
-            key={action.id}
-            onClick={() => handleActionClick(action.id)}
-            className={`${action.color} text-white p-3 rounded-lg transition-colors duration-200 text-left hover:shadow-md`}
-          >
-            <div className="flex items-center">
-              <span className="text-lg mr-3">{action.icon}</span>
-              <div>
-                <div className="font-medium">{action.title}</div>
-                <div className="text-xs opacity-90">{action.description}</div>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Quick Actions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {quickActions.map((action) => {
+            const IconComponent = action.icon;
+            return (
+              <Button
+                key={action.id}
+                onClick={() => handleActionClick(action.id)}
+                className={`w-full justify-start h-auto p-3 ${action.color}`}
+                variant="default"
+              >
+                <div className="flex items-center">
+                  <IconComponent className="text-lg mr-3" />
+                  <div className="text-left">
+                    <div className="font-medium">{action.title}</div>
+                    <div className="text-xs opacity-90">
+                      {action.description}
+                    </div>
+                  </div>
+                </div>
+              </Button>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

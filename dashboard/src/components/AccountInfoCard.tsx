@@ -2,50 +2,58 @@
 
 import { useAccountInfo } from "@/hooks";
 import { DashboardUtils } from "@/lib";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function AccountInfoCard() {
   const { accountInfo, isLoading, error } = useAccountInfo();
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Account Information
-        </h2>
-        <div className="animate-pulse">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i}>
-                  <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                  <div className="h-6 bg-gray-200 rounded w-32"></div>
+                  <Skeleton className="h-4 w-24 mb-2" />
+                  <Skeleton className="h-6 w-32" />
                 </div>
               ))}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i}>
-                  <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                  <div className="h-6 bg-gray-200 rounded w-32"></div>
+                  <Skeleton className="h-4 w-24 mb-2" />
+                  <Skeleton className="h-6 w-32" />
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Account Information
-        </h2>
-        <div className="text-red-600 text-sm">
-          <p>Error loading account information: {error}</p>
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertDescription>
+              Error loading account information: {error}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -54,53 +62,60 @@ export function AccountInfoCard() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Account Information
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm font-medium text-gray-500">
-              Account ID
-            </label>
-            <p className="text-lg font-mono text-gray-900">
-              {accountInfo.accountId}
-            </p>
+    <Card>
+      <CardHeader>
+        <CardTitle>Account Information</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Account ID
+              </label>
+              <p className="text-lg font-mono text-foreground">
+                {accountInfo.accountId}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Region
+              </label>
+              <p className="text-lg text-foreground">{accountInfo.region}</p>
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-medium text-gray-500">Region</label>
-            <p className="text-lg text-gray-900">{accountInfo.region}</p>
-          </div>
-        </div>
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm font-medium text-gray-500">
-              Billing Contact
-            </label>
-            <p className="text-lg text-gray-900">
-              {accountInfo.billingContact}
-            </p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-500">Status</label>
-            <div className="flex items-center">
-              <div
-                className={`w-2 h-2 ${DashboardUtils.getStatusIndicatorColor(
-                  accountInfo.status
-                )} rounded-full mr-2`}
-              ></div>
-              <span
-                className={`text-lg ${DashboardUtils.getStatusColor(
-                  accountInfo.status
-                )} font-medium`}
-              >
-                {accountInfo.status}
-              </span>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Billing Contact
+              </label>
+              <p className="text-lg text-foreground">
+                {accountInfo.billingContact}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Status
+              </label>
+              <div className="flex items-center">
+                <Badge
+                  variant={
+                    accountInfo.status === "Active" ? "default" : "destructive"
+                  }
+                  className="flex items-center gap-1"
+                >
+                  <div
+                    className={`w-2 h-2 ${DashboardUtils.getStatusIndicatorColor(
+                      accountInfo.status
+                    )} rounded-full`}
+                  />
+                  {accountInfo.status}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

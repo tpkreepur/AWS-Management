@@ -1,4 +1,12 @@
 import { AccountInfo, EC2Stats, QuickAction } from "@/types";
+import {
+  FaRocket,
+  FaCamera,
+  FaHdd,
+  FaSync,
+  FaDollarSign,
+  FaLock,
+} from "react-icons/fa";
 
 // Client-side AWS data service that calls API routes
 export class AWSDataService {
@@ -42,7 +50,7 @@ export class AWSDataService {
         description: isRealAWS
           ? "Launch new EC2 instance"
           : "Mock: Launch new EC2 instance",
-        icon: "🚀",
+        icon: FaRocket,
         color: "bg-blue-500 hover:bg-blue-600",
         action: this.launchInstance.bind(this),
         enabled: true,
@@ -53,7 +61,7 @@ export class AWSDataService {
         description: isRealAWS
           ? "Manage EBS snapshots"
           : "Mock: Manage EBS snapshots",
-        icon: "📸",
+        icon: FaCamera,
         color: "bg-green-500 hover:bg-green-600",
         action: this.viewSnapshots.bind(this),
         enabled: true,
@@ -64,7 +72,7 @@ export class AWSDataService {
         description: isRealAWS
           ? "Manage EBS volumes"
           : "Mock: Manage EBS volumes",
-        icon: "💽",
+        icon: FaHdd,
         color: "bg-purple-500 hover:bg-purple-600",
         action: this.manageVolumes.bind(this),
         enabled: true,
@@ -75,7 +83,7 @@ export class AWSDataService {
         description: isRealAWS
           ? "Check backup status"
           : "Mock: Check backup status",
-        icon: "🔄",
+        icon: FaSync,
         color: "bg-orange-500 hover:bg-orange-600",
         action: this.checkBackupStatus.bind(this),
         enabled: true,
@@ -86,7 +94,7 @@ export class AWSDataService {
         description: isRealAWS
           ? "View cost analysis"
           : "Mock: View cost analysis",
-        icon: "💰",
+        icon: FaDollarSign,
         color: "bg-yellow-500 hover:bg-yellow-600",
         action: this.viewCostAnalysis.bind(this),
         enabled: true,
@@ -97,7 +105,7 @@ export class AWSDataService {
         description: isRealAWS
           ? "Manage security groups"
           : "Mock: Manage security groups",
-        icon: "🔒",
+        icon: FaLock,
         color: "bg-red-500 hover:bg-red-600",
         action: this.manageSecurityGroups.bind(this),
         enabled: true,
