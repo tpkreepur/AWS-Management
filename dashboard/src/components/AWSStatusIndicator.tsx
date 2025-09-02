@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { awsDataService } from "@/services/aws-data.service";
+import { awsStatusService } from "@/services";
 import { Badge } from "@/components/ui/badge";
 
 interface ServiceInfo {
@@ -11,6 +11,11 @@ interface ServiceInfo {
   hasCredentials: boolean;
 }
 
+/**
+ * Displays the current AWS connection status (real or mock) as a badge, including profile and region info.
+ * Fetches service info using awsStatusService.
+ * @returns {JSX.Element} The rendered status indicator badge.
+ */
 export function AWSStatusIndicator() {
   const [serviceInfo, setServiceInfo] = useState<ServiceInfo>({
     mode: "Loading...",
@@ -21,7 +26,7 @@ export function AWSStatusIndicator() {
   useEffect(() => {
     const fetchServiceInfo = async () => {
       try {
-        const info = await awsDataService.getServiceInfo();
+        const info = await awsStatusService.getServiceInfo();
         setServiceInfo(info);
       } catch (error) {
         console.error("Error fetching service info:", error);

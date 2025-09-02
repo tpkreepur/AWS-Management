@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+/**
+ * Renders a panel of quick action buttons for AWS operations.
+ * Each action is loaded dynamically and can be executed via the useQuickActions hook.
+ * @returns {JSX.Element} The rendered quick actions card with action buttons.
+ */
 export function QuickActions() {
   const { quickActions, isLoading, error, executeAction } = useQuickActions();
 

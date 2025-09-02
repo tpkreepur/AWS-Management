@@ -1,33 +1,25 @@
-import { NextResponse } from "next/server";
-import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
-import { fromIni } from "@aws-sdk/credential-provider-ini";
+import { GetCallerIdentityCommand } from "@aws-sdk/client-sts";
 import {
   AccountClient,
   GetAccountInformationCommand,
   GetContactInformationCommand,
 } from "@aws-sdk/client-account";
-
-interface ClientConfig {
-  region: string;
-  credentials?: ReturnType<typeof fromIni>;
-}
+import { handleAPIError, createAPISuccessResponse } from "@/lib/api-error-handler";
+import { awsConfig } from "@/services/aws-config.service";
 
 export async function GET() {
   try {
-    const region =
-      process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || "us-east-1";
-    const profile = process.env.AWS_PROFILE;
+    // Use the centralized AWS config service
+    const stsClient = awsConfig.getSTSClient();
+    const config = awsConfig.getConfig();
 
-    const clientConfig: ClientConfig = { region };
-
-    // Use AWS profile if specified
-    if (profile) {
-      clientConfig.credentials = fromIni({ profile });
-    }
-
-    // Initialize clients
-    const stsClient = new STSClient(clientConfig);
-    const accountClient = new AccountClient(clientConfig);
+    // Initialize Account client with the same configuration
+    const accountClient = new AccountClient({
+      region: config.region,
+      ...(config.profile && { 
+        credentials: awsConfig.getSTSClient().config.credentials 
+      })
+    });
 
     // Get caller identity for basic account info
     const callerIdentityCommand = new GetCallerIdentityCommand({});
@@ -48,9 +40,9 @@ export async function GET() {
       "Not Available";
 
     // Return data matching the AccountInfo interface
-    return NextResponse.json({
+    const accountData = {
       accountId: callerIdentityResponse.Account || "Unknown",
-      region,
+      region: config.region,
       billingContact,
       status: "Active" as const, // Default to Active for successful AWS calls
       // Include additional AWS-specific fields for reference
@@ -59,18 +51,19 @@ export async function GET() {
       assumedRoleUser: callerIdentityResponse.Arn?.includes("assumed-role")
         ? "Yes"
         : "No",
-    });
-  } catch (error) {
-    console.error("Error fetching account info:", error);
+    };
 
-    // Return mock data matching the AccountInfo interface
-    return NextResponse.json({
+    return createAPISuccessResponse(accountData, 'aws');
+  } catch (error) {
+    // Define fallback mock data
+    const config = awsConfig.getConfig();
+    const mockData = {
       accountId: "123456789012",
-      region:
-        process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || "us-east-1",
+      region: config.region,
       billingContact: "Mock User",
       status: "Active" as const,
-      error: "AWS API unavailable - using mock data",
-    });
+    };
+
+    return handleAPIError(error, mockData, 'account endpoint');
   }
 }

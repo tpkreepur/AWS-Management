@@ -1,4 +1,5 @@
 import { AccountInfo, EC2Stats, QuickAction } from "@/types";
+import { awsHttpClient } from "@/lib/http-client";
 import {
   FaRocket,
   FaCamera,
@@ -10,34 +11,26 @@ import {
 
 // Client-side AWS data service that calls API routes
 export class AWSDataService {
-  private baseUrl = "/api/aws";
-
+  /**
+   * Fetches AWS account information from the API route.
+   * @returns {Promise<AccountInfo>} The AWS account info object.
+   */
   async getAccountInfo(): Promise<AccountInfo> {
-    try {
-      const response = await fetch(`${this.baseUrl}/account`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching account info:", error);
-      throw new Error(`Failed to fetch account information: ${error}`);
-    }
+    return awsHttpClient.get<AccountInfo>('/account', 'account information');
   }
 
+  /**
+   * Fetches EC2 statistics from the API route.
+   * @returns {Promise<EC2Stats>} The EC2 statistics object.
+   */
   async getEC2Stats(): Promise<EC2Stats> {
-    try {
-      const response = await fetch(`${this.baseUrl}/ec2`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching EC2 stats:", error);
-      throw new Error(`Failed to fetch EC2 statistics: ${error}`);
-    }
+    return awsHttpClient.get<EC2Stats>('/ec2', 'EC2 statistics');
   }
 
+  /**
+   * Returns a list of available quick actions, with mock or real AWS labels based on current mode.
+   * @returns {Promise<QuickAction[]>} Array of quick action objects.
+   */
   async getQuickActions(): Promise<QuickAction[]> {
     // Get service status to determine if actions should be enabled
     const status = await this.getServiceInfo();
@@ -185,6 +178,10 @@ export class AWSDataService {
   }
 
   // Public method to get current configuration info
+  /**
+   * Gets current service configuration info (mode, profile, region, credentials).
+   * @returns {Promise<{mode: string; profile?: string; region?: string; hasCredentials: boolean}>} Service info object.
+   */
   async getServiceInfo(): Promise<{
     mode: string;
     profile?: string;
@@ -192,11 +189,7 @@ export class AWSDataService {
     hasCredentials: boolean;
   }> {
     try {
-      const response = await fetch(`${this.baseUrl}/status`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
+      return await awsHttpClient.get('/status', 'service configuration');
     } catch (error) {
       console.error("Error fetching service info:", error);
       return {
@@ -207,11 +200,17 @@ export class AWSDataService {
   }
 
   // Public method to check if using real AWS
+  /**
+   * Checks if the app is using real AWS credentials and endpoints.
+   * @returns {Promise<boolean>} True if using real AWS, false otherwise.
+   */
   async isUsingRealAWS(): Promise<boolean> {
     const info = await this.getServiceInfo();
     return info.mode === "Real AWS";
   }
 }
 
-// Create a singleton instance
+/**
+ * Singleton instance of AWSDataService for use throughout the app.
+ */
 export const awsDataService = new AWSDataService();

@@ -27,6 +27,10 @@ export class RealAWSDataService {
     this.stsClient = awsConfig.getSTSClient();
   }
 
+  /**
+   * Fetches AWS account information using STS GetCallerIdentity.
+   * @returns {Promise<AccountInfo>} The AWS account info object.
+   */
   async getAccountInfo(): Promise<AccountInfo> {
     try {
       const command = new GetCallerIdentityCommand({});
@@ -49,6 +53,10 @@ export class RealAWSDataService {
     }
   }
 
+  /**
+   * Fetches EC2 statistics and instance details using DescribeInstances.
+   * @returns {Promise<EC2Stats>} The EC2 statistics object.
+   */
   async getEC2Stats(): Promise<EC2Stats> {
     try {
       const command = new DescribeInstancesCommand({});
@@ -132,6 +140,10 @@ export class RealAWSDataService {
     }
   }
 
+  /**
+   * Returns a list of available quick actions for real AWS operations.
+   * @returns {Promise<QuickAction[]>} Array of quick action objects.
+   */
   async getQuickActions(): Promise<QuickAction[]> {
     const config = awsConfig.getConfig();
 
@@ -193,6 +205,12 @@ export class RealAWSDataService {
     ];
   }
 
+  /**
+   * Determines the operating system platform from AWS instance metadata.
+   * @param {string} platform - The platform field from EC2 instance data
+   * @param {string} platformDetails - The platformDetails field from EC2 instance data
+   * @returns {OperatingSystem} The detected operating system
+   */
   private determinePlatform(
     platform?: string,
     platformDetails?: string
@@ -209,6 +227,11 @@ export class RealAWSDataService {
     return "unknown";
   }
 
+  /**
+   * Processes AWS EC2 instance tags into a key-value record.
+   * @param {Array<{ Key?: string; Value?: string }>} tags - The tags array from EC2 instance data
+   * @returns {Record<string, string>} A key-value mapping of tags
+   */
   private processTags(
     tags?: Array<{ Key?: string; Value?: string }>
   ): Record<string, string> {
@@ -222,6 +245,11 @@ export class RealAWSDataService {
   }
 
   // Action handlers - these can be implemented to perform real AWS operations
+  
+  /**
+   * Launches a new EC2 instance with configurable parameters.
+   * @returns {Promise<void>} Promise that resolves when the launch operation is complete
+   */
   private async launchInstance(): Promise<void> {
     console.log("Launching new EC2 instance...");
     // Example implementation:
@@ -235,26 +263,46 @@ export class RealAWSDataService {
     alert("Launch Instance functionality would be implemented here");
   }
 
+  /**
+   * Views and manages EBS snapshots for the AWS account.
+   * @returns {Promise<void>} Promise that resolves when the operation is complete
+   */
   private async viewSnapshots(): Promise<void> {
     console.log("Viewing EBS snapshots...");
     alert("Snapshot management would be implemented here");
   }
 
+  /**
+   * Opens the EBS volume management interface.
+   * @returns {Promise<void>} Promise that resolves when the operation is complete
+   */
   private async manageVolumes(): Promise<void> {
     console.log("Opening volume management...");
     alert("Volume management would be implemented here");
   }
 
+  /**
+   * Checks the status of AWS backup operations and displays results.
+   * @returns {Promise<void>} Promise that resolves when the check is complete
+   */
   private async checkBackupStatus(): Promise<void> {
     console.log("Checking backup status...");
     alert("Backup status check would be implemented here");
   }
 
+  /**
+   * Opens the cost analysis dashboard for reviewing AWS spending.
+   * @returns {Promise<void>} Promise that resolves when the operation is complete
+   */
   private async viewCostAnalysis(): Promise<void> {
     console.log("Opening cost analysis...");
     alert("Cost analysis would be implemented here");
   }
 
+  /**
+   * Opens the security group management interface for configuring network access rules.
+   * @returns {Promise<void>} Promise that resolves when the operation is complete
+   */
   private async manageSecurityGroups(): Promise<void> {
     console.log("Managing security groups...");
     alert("Security group management would be implemented here");

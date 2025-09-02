@@ -7,6 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+/**
+ * Displays AWS account information in a card UI, including loading and error states.
+ * Fetches data using the useAccountInfo hook.
+ * @returns {JSX.Element | null} The rendered account info card, loading skeleton, or error alert.
+ */
 export function AccountInfoCard() {
   const { accountInfo, isLoading, error } = useAccountInfo();
 

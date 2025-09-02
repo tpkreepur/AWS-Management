@@ -2,8 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { AccountInfo, LoadingState } from "@/types";
-import { awsDataService } from "@/services";
+import { awsAccountService } from "@/services";
+import { createUserFriendlyErrorMessage } from "@/lib/error-messages";
 
+/**
+ * Custom React hook to fetch AWS account information and manage loading/error state.
+ * @returns {{
+ *   accountInfo: AccountInfo | null,
+ *   isLoading: boolean,
+ *   error: string | null,
+ *   refetch: () => Promise<void>
+ * }} Hook state and refetch function.
+ */
 export function useAccountInfo() {
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [loadingState, setLoadingState] = useState<LoadingState>({
@@ -15,15 +25,12 @@ export function useAccountInfo() {
     const fetchAccountInfo = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsDataService.getAccountInfo();
+        const data = await awsAccountService.getAccountInfo();
         setAccountInfo(data);
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to fetch account info",
+          error: createUserFriendlyErrorMessage(error, 'account'),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));
@@ -37,15 +44,12 @@ export function useAccountInfo() {
     const fetchAccountInfo = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsDataService.getAccountInfo();
+        const data = await awsAccountService.getAccountInfo();
         setAccountInfo(data);
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to fetch account info",
+          error: createUserFriendlyErrorMessage(error, 'account'),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));

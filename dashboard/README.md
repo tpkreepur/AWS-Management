@@ -1,6 +1,56 @@
 # AWS Account Dashboard
 
-A modern Next.js dashboard for managing AWS account information and resources.
+A modern Next.js dashboard for managing AWS account information and resources, designed to work with both mock data for development and real AWS APIs for production.
+
+## Architecture Overview
+
+### Application Structure
+
+```text
+src/
+├── app/                    # Next.js app router and API routes
+│   ├── api/aws/           # AWS API endpoints
+│   │   ├── account/       # Account information endpoint
+│   │   ├── ec2/          # EC2 statistics endpoint
+│   │   └── status/       # Service configuration endpoint
+│   ├── layout.tsx        # Root layout with theme provider
+│   └── page.tsx          # Main dashboard page
+├── components/           # React components
+│   ├── ui/              # Reusable UI components (shadcn/ui)
+│   ├── Dashboard.tsx    # Main dashboard layout
+│   ├── AccountInfoCard.tsx     # Account information display
+│   ├── EC2Overview.tsx        # EC2 statistics and charts
+│   ├── QuickActions.tsx       # Action buttons panel
+│   └── AWSStatusIndicator.tsx # Connection status display
+├── hooks/               # Custom React hooks
+│   ├── use-account-info.ts   # Account data fetching
+│   ├── use-ec2-stats.ts      # EC2 statistics fetching
+│   └── use-quick-actions.ts  # Quick actions management
+├── services/           # Data services and business logic
+│   ├── aws-data.service.ts      # Client-side AWS service abstraction
+│   ├── real-aws-data.service.ts # Real AWS SDK implementation
+│   └── aws-config.service.ts    # AWS configuration management
+├── types/             # TypeScript type definitions
+│   ├── aws.ts        # AWS-specific types
+│   └── index.ts      # Shared types and exports
+└── lib/              # Utility functions and configurations
+    ├── utils.ts      # General utilities
+    └── dashboard-utils.ts  # Dashboard-specific utilities
+```
+
+### Data Flow Architecture
+
+1. **Components** → **Hooks** → **Services** → **API Routes** → **AWS SDK**
+2. **Mock/Real Data Toggle**: Environment-based switching between mock data and real AWS APIs
+3. **Error Handling**: Consistent error boundaries and user feedback across all layers
+4. **Loading States**: Skeleton components and loading indicators for better UX
+
+### Key Design Patterns
+
+- **Service Layer Pattern**: Abstraction over AWS SDK with both mock and real implementations
+- **Custom Hooks Pattern**: React hooks for state management and data fetching
+- **Repository Pattern**: Centralized data access through service classes
+- **Observer Pattern**: Real-time status updates and data refetching
 
 ## Features
 
@@ -38,6 +88,62 @@ A modern Next.js dashboard for managing AWS account information and resources.
    ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Usage Guide
+
+### Mock vs Real AWS Data
+
+The application automatically detects your AWS configuration and switches between mock and real data:
+
+- **Mock Mode**: When no AWS credentials are configured, displays sample data
+- **Real AWS Mode**: When AWS credentials are available, fetches live data from your AWS account
+
+You can check the current mode via the status indicator in the top-right corner of the dashboard.
+
+### Dashboard Components Usage
+
+#### Account Information Card
+
+- Displays your AWS account details including Account ID, region, and billing information
+- Refreshes automatically when switching between mock/real modes
+- Shows error states if AWS API calls fail
+
+#### EC2 Overview
+
+- Real-time display of EC2 instance statistics
+- Interactive charts showing instance distribution by state and OS
+- Detailed breakdown of running, stopped, and terminated instances
+- Instance list with filtering capabilities (when using real data)
+
+#### Quick Actions Panel
+
+- One-click access to common AWS management tasks
+- Actions are contextual (show "Mock" prefix when in mock mode)
+- Currently includes: Launch Instance, View Snapshots, Manage Volumes, Backup Status, Cost Analysis, Security Groups
+- Each action provides appropriate feedback based on current mode
+
+#### AWS Status Indicator
+
+- Shows current connection mode (Mock/Real AWS)
+- Displays active AWS profile and region when available
+- Color-coded for quick visual reference
+
+### Switching Between Mock and Real Data
+
+To switch to real AWS data, set up your AWS credentials:
+
+```bash
+# Method 1: AWS Profile (Recommended)
+aws configure --profile myprofile
+export AWS_PROFILE=myprofile
+
+# Method 2: Environment Variables
+export AWS_ACCESS_KEY_ID=your_access_key_id
+export AWS_SECRET_ACCESS_KEY=your_secret_access_key
+export AWS_REGION=us-east-1
+```
+
+The application will automatically detect the credentials and switch to real AWS mode on the next page load or data refresh.
 
 ## Available Scripts
 
@@ -148,7 +254,7 @@ For real AWS data, the application needs these IAM permissions:
    npm run dev
    ```
 
-   Visit http://localhost:3000
+   Visit <http://localhost:3000>
 
 3. **Production Build**:
 

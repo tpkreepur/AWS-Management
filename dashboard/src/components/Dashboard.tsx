@@ -6,6 +6,11 @@ import { QuickActions } from "./QuickActions";
 import { AWSStatusIndicator } from "./AWSStatusIndicator";
 import { ModeToggle } from "./theme-toggle";
 
+/**
+ * Main dashboard layout for AWS DevOps Dashboard.
+ * Renders header, status indicator, theme toggle, account info, quick actions, and EC2 overview.
+ * @returns {JSX.Element} The rendered dashboard UI.
+ */
 export function Dashboard() {
   return (
     <div className="min-h-screen bg-background">

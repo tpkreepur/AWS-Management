@@ -1,26 +1,11 @@
-import { NextResponse } from "next/server";
-import { EC2Client, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
-import { fromIni } from "@aws-sdk/credential-provider-ini";
-
-interface ClientConfig {
-  region: string;
-  credentials?: ReturnType<typeof fromIni>;
-}
+import { DescribeInstancesCommand } from "@aws-sdk/client-ec2";
+import { handleAPIError, createAPISuccessResponse } from "@/lib/api-error-handler";
+import { awsConfig } from "@/services/aws-config.service";
 
 export async function GET() {
   try {
-    const region =
-      process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || "us-east-1";
-    const profile = process.env.AWS_PROFILE;
-
-    const clientConfig: ClientConfig = { region };
-
-    // Use AWS profile if specified
-    if (profile) {
-      clientConfig.credentials = fromIni({ profile });
-    }
-
-    const ec2Client = new EC2Client(clientConfig);
+    // Use the centralized AWS config service
+    const ec2Client = awsConfig.getEC2Client();
     const command = new DescribeInstancesCommand({});
     const response = await ec2Client.send(command);
 
@@ -73,7 +58,7 @@ export async function GET() {
       });
     });
 
-    return NextResponse.json({
+    const ec2Data = {
       total,
       running,
       stopped,
@@ -82,12 +67,12 @@ export async function GET() {
       pending,
       stopping,
       terminated,
-    });
-  } catch (error) {
-    console.error("Error fetching EC2 stats:", error);
+    };
 
+    return createAPISuccessResponse(ec2Data, 'aws');
+  } catch (error) {
     // Return mock data if AWS API fails
-    return NextResponse.json({
+    const mockData = {
       total: 5,
       running: 3,
       stopped: 2,
@@ -96,8 +81,9 @@ export async function GET() {
       pending: 0,
       stopping: 0,
       terminated: 0,
-      error: "AWS API unavailable - using mock data",
-    });
+    };
+
+    return handleAPIError(error, mockData, 'EC2 endpoint');
   }
 }
 

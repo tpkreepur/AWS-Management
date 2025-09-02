@@ -2,8 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { QuickAction, LoadingState } from "@/types";
-import { awsDataService } from "@/services";
+import { awsQuickActionsService } from "@/services";
+import { createUserFriendlyErrorMessage } from "@/lib/error-messages";
 
+/**
+ * Custom React hook to fetch and execute quick actions, with loading/error state management.
+ * @returns {{
+ *   quickActions: QuickAction[],
+ *   isLoading: boolean,
+ *   error: string | null,
+ *   executeAction: (actionId: string) => Promise<void>,
+ *   refetch: () => Promise<void>
+ * }} Hook state, action executor, and refetch function.
+ */
 export function useQuickActions() {
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   const [loadingState, setLoadingState] = useState<LoadingState>({
@@ -15,15 +26,12 @@ export function useQuickActions() {
     const fetchQuickActions = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsDataService.getQuickActions();
+        const data = await awsQuickActionsService.getQuickActions();
         setQuickActions(data);
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to fetch quick actions",
+          error: createUserFriendlyErrorMessage(error, 'actions'),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));
@@ -34,13 +42,10 @@ export function useQuickActions() {
   }, []);
 
   const executeAction = async (actionId: string) => {
-    const action = quickActions.find((a) => a.id === actionId);
-    if (action) {
-      try {
-        await action.action();
-      } catch (error) {
-        console.error(`Failed to execute action ${actionId}:`, error);
-      }
+    try {
+      await awsQuickActionsService.executeAction(actionId);
+    } catch (error) {
+      console.error(`Failed to execute action ${actionId}:`, error);
     }
   };
 
@@ -48,15 +53,12 @@ export function useQuickActions() {
     const fetchQuickActions = async () => {
       try {
         setLoadingState({ isLoading: true, error: null });
-        const data = await awsDataService.getQuickActions();
+        const data = await awsQuickActionsService.getQuickActions();
         setQuickActions(data);
       } catch (error) {
         setLoadingState({
           isLoading: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to fetch quick actions",
+          error: createUserFriendlyErrorMessage(error, 'actions'),
         });
       } finally {
         setLoadingState((prev) => ({ ...prev, isLoading: false }));

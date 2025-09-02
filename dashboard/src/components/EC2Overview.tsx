@@ -7,6 +7,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadialChart } from "@/components/ui/radial-chart";
 
+/**
+ * Displays EC2 instance overview statistics and charts.
+ * Shows instance counts by state, OS type, and detailed breakdowns.
+ * @returns {JSX.Element} The rendered EC2 overview card with statistics and charts.
+ */
 export function EC2Overview() {
   const { ec2Stats, isLoading, error } = useEC2Stats();
 

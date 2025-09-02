@@ -22,6 +22,10 @@ export class AWSConfigService {
     };
   }
 
+  /**
+   * Returns the singleton instance of AWSConfigService.
+   * @returns {AWSConfigService} The singleton instance.
+   */
   public static getInstance(): AWSConfigService {
     if (!AWSConfigService.instance) {
       AWSConfigService.instance = new AWSConfigService();
@@ -29,10 +33,18 @@ export class AWSConfigService {
     return AWSConfigService.instance;
   }
 
+  /**
+   * Gets the current AWS configuration.
+   * @returns {AWSConfig} The AWS configuration object.
+   */
   public getConfig(): AWSConfig {
     return { ...this.config };
   }
 
+  /**
+   * Returns an EC2Client instance configured with the current AWS settings.
+   * @returns {EC2Client} The EC2 client instance.
+   */
   public getEC2Client(): EC2Client {
     if (!this.ec2Client) {
       const clientConfig: {
@@ -52,6 +64,10 @@ export class AWSConfigService {
     return this.ec2Client;
   }
 
+  /**
+   * Returns an STSClient instance configured with the current AWS settings.
+   * @returns {STSClient} The STS client instance.
+   */
   public getSTSClient(): STSClient {
     if (!this.stsClient) {
       const clientConfig: {
@@ -71,6 +87,10 @@ export class AWSConfigService {
     return this.stsClient;
   }
 
+  /**
+   * Updates the AWS configuration and resets clients to use the new config.
+   * @param {Partial<AWSConfig>} newConfig - Partial AWS config to update.
+   */
   public updateConfig(newConfig: Partial<AWSConfig>): void {
     this.config = { ...this.config, ...newConfig };
     // Reset clients to use new config
@@ -79,4 +99,7 @@ export class AWSConfigService {
   }
 }
 
+/**
+ * Singleton instance of AWSConfigService for use throughout the app.
+ */
 export const awsConfig = AWSConfigService.getInstance();
