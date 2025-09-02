@@ -37,6 +37,17 @@ export class AWSDataService {
 
     return [
       {
+        id: "launch-instance",
+        title: isRealAWS ? "Launch Instance" : "Launch Instance (Mock)",
+        description: isRealAWS
+          ? "Launch new EC2 instance"
+          : "Mock: Launch new EC2 instance",
+        icon: "🚀",
+        color: "bg-blue-500 hover:bg-blue-600",
+        action: this.launchInstance.bind(this),
+        enabled: true,
+      },
+      {
         id: "view-snapshots",
         title: isRealAWS ? "View Snapshots" : "View Snapshots (Mock)",
         description: isRealAWS
@@ -45,7 +56,51 @@ export class AWSDataService {
         icon: "📸",
         color: "bg-green-500 hover:bg-green-600",
         action: this.viewSnapshots.bind(this),
-        enabled: isRealAWS,
+        enabled: true,
+      },
+      {
+        id: "manage-volumes",
+        title: isRealAWS ? "Manage Volumes" : "Manage Volumes (Mock)",
+        description: isRealAWS
+          ? "Manage EBS volumes"
+          : "Mock: Manage EBS volumes",
+        icon: "💽",
+        color: "bg-purple-500 hover:bg-purple-600",
+        action: this.manageVolumes.bind(this),
+        enabled: true,
+      },
+      {
+        id: "backup-status",
+        title: isRealAWS ? "Backup Status" : "Backup Status (Mock)",
+        description: isRealAWS
+          ? "Check backup status"
+          : "Mock: Check backup status",
+        icon: "🔄",
+        color: "bg-orange-500 hover:bg-orange-600",
+        action: this.checkBackupStatus.bind(this),
+        enabled: true,
+      },
+      {
+        id: "cost-analysis",
+        title: isRealAWS ? "Cost Analysis" : "Cost Analysis (Mock)",
+        description: isRealAWS
+          ? "View cost analysis"
+          : "Mock: View cost analysis",
+        icon: "💰",
+        color: "bg-yellow-500 hover:bg-yellow-600",
+        action: this.viewCostAnalysis.bind(this),
+        enabled: true,
+      },
+      {
+        id: "security-groups",
+        title: isRealAWS ? "Security Groups" : "Security Groups (Mock)",
+        description: isRealAWS
+          ? "Manage security groups"
+          : "Mock: Manage security groups",
+        icon: "🔒",
+        color: "bg-red-500 hover:bg-red-600",
+        action: this.manageSecurityGroups.bind(this),
+        enabled: true,
       },
     ];
   }
