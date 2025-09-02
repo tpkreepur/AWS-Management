@@ -1,51 +1,63 @@
+"use client";
+
+import { useQuickActions } from "@/hooks";
+
 export function QuickActions() {
-  const actions = [
-    {
-      title: "Launch Instance",
-      description: "Start a new EC2 instance",
-      icon: "🚀",
-      color: "bg-blue-500 hover:bg-blue-600"
-    },
-    {
-      title: "View Snapshots",
-      description: "Manage EBS snapshots",
-      icon: "📸",
-      color: "bg-green-500 hover:bg-green-600"
-    },
-    {
-      title: "Volume Management",
-      description: "Manage EBS volumes",
-      icon: "💾",
-      color: "bg-purple-500 hover:bg-purple-600"
-    },
-    {
-      title: "Backup Status",
-      description: "Check backup status",
-      icon: "🔄",
-      color: "bg-orange-500 hover:bg-orange-600"
-    },
-    {
-      title: "Cost Analysis",
-      description: "View cost breakdown",
-      icon: "💰",
-      color: "bg-yellow-500 hover:bg-yellow-600"
-    },
-    {
-      title: "Security Groups",
-      description: "Manage firewall rules",
-      icon: "🔒",
-      color: "bg-red-500 hover:bg-red-600"
-    }
-  ];
+  const { quickActions, isLoading, error, executeAction } = useQuickActions();
+
+  const handleActionClick = async (actionId: string) => {
+    await executeAction(actionId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Quick Actions
+        </h2>
+        <div className="animate-pulse">
+          <div className="grid grid-cols-1 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-gray-100 p-3 rounded-lg">
+                <div className="flex items-center">
+                  <div className="w-6 h-6 bg-gray-200 rounded mr-3"></div>
+                  <div>
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-1"></div>
+                    <div className="h-3 bg-gray-200 rounded w-32"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Quick Actions
+        </h2>
+        <div className="text-red-600 text-sm">
+          <p>Error loading quick actions: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        Quick Actions
+      </h2>
       <div className="grid grid-cols-1 gap-3">
-        {actions.map((action, index) => (
+        {quickActions.map((action) => (
           <button
-            key={index}
-            className={`${action.color} text-white p-3 rounded-lg transition-colors duration-200 text-left`}
+            key={action.id}
+            onClick={() => handleActionClick(action.id)}
+            className={`${action.color} text-white p-3 rounded-lg transition-colors duration-200 text-left hover:shadow-md`}
           >
             <div className="flex items-center">
               <span className="text-lg mr-3">{action.icon}</span>
